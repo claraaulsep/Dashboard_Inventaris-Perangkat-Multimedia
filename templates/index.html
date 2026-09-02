@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Inventaris Perangkat Multi Media - Zona 1 & Field Jambi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js and DataLabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        lightBg: '#F9FAFC', lightSidebar: '#D3F0F8', lightAccent: '#3B82F6', lightUrgent: '#E4F9F2',
+                        darkBg: '#0F172A', darkCard: '#1E293B', darkAccent: '#38BDF8', darkUrgent: '#FB923C',
+                    }
+                }
+            }
+        }
+        Chart.register(ChartDataLabels);
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #3B82F6;
+            font-weight: 600;
+        }
+
+        .dark .nav-item.active {
+            background-color: #1E293B;
+            color: #38BDF8;
+        }
+
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+    </style>
+</head>
+
+<body class="bg-lightBg text-slate-800 dark:bg-darkBg dark:text-slate-200 min-h-screen flex" data-role="{{ role }}">
+
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="bg-lightSidebar dark:bg-darkCard w-64 flex-shrink-0 fixed md:static inset-y-0 left-0 transform md:translate-x-0 -translate-x-full transition-all duration-300 ease-in-out z-50 flex flex-col border-r border-slate-200 dark:border-slate-700">
+        <div class="h-20 flex items-center justify-between px-6 border-b border-white/20 dark:border-slate-700/50">
+            <div class="flex items-center gap-3 font-bold text-xl text-slate-800 dark:text-white" id="sidebar-logo">
+                <i class="fa-solid fa-fire text-lightAccent dark:text-darkAccent"></i>
+                <span class="logo-text">PERTAMINA</span>
+            </div>
+            <button onclick="toggleSidebar()"
+                class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-transform duration-300"
+                id="sidebar-toggle-btn">
+                <i class="fa-solid fa-bars md:fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <a href="#" onclick="switchView('dashboard', this)"
+                class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="#" onclick="switchView('pengaduan', this)"
+                class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/30 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-bullhorn w-5 text-center"></i> <span class="nav-text">Pengaduan</span>
+            </a>
+            <a href="#" onclick="switchView('data', this)"
+                class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/30 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-server w-5 text-center"></i> <span class="nav-text">Data Perangkat</span>
+            </a>
+            <a href="#" onclick="switchView('pengaturan', this)"
+                class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/30 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i> <span class="nav-text">Pengaturan</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/20 dark:border-slate-700/50">
+            <button onclick="toggleDarkMode()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-colors shadow-sm">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+                <span id="theme-text" class="nav-text">Mode Gelap</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300">
+
+        <!-- Header -->
+        <header
+            class="h-20 bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 z-10 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()"
+                    class="md:hidden p-2 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white leading-tight">Dashboard
+                        Inventaris Perangkat Multi Media</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide">Zona 1 dan Field
+                        Jambi</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- Search -->
+                <div class="hidden md:block relative">
+                    <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="Cari S/N atau Device..."
+                        class="pl-10 pr-4 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-lightAccent dark:focus:ring-darkAccent border-transparent text-slate-700 dark:text-slate-300 w-72 transition-shadow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <div id="searchResults"
+                        class="absolute top-full mt-2 w-full max-h-96 overflow-y-auto bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl hidden z-50">
+                    </div>
+                </div>
+
+                <!-- Notif -->
+                <div class="relative">
+                    <button onclick="openNotifications()"
+                        class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+                        <i class="fa-regular fa-bell text-xl"></i>
+                        <span id="notif-dot"
+                            class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-darkCard hidden"></span>
+                        <span id="notif-badge"
+                            class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 hidden"></span>
+                    </button>
+                    <div id="notifDropdown"
+                        class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl hidden z-50 overflow-hidden">
+                        <div
+                            class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                            <h4 class="font-bold text-sm">Notifikasi</h4>
+                            <span class="text-xs text-slate-400" id="notif-count-label"></span>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto">
+                            <p class="text-xs text-slate-500 text-center py-6">Belum ada notifikasi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Dropdown -->
+                <div class="relative">
+                    <button onclick="toggleUserMenu()"
+                        class="flex items-center gap-3 pl-6 border-l border-slate-200 dark:border-slate-700 focus:outline-none">
+                        <img src="https://ui-avatars.com/api/?name={{ name }}&background=3B82F6&color=fff" alt="Profile"
+                            class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="hidden md:block text-left">
+                            <p class="font-semibold text-slate-700 dark:text-slate-200 leading-none text-sm">{{ name }}
+                            </p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold">{{ role }}
+                            </p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </button>
+                    <div id="userMenu"
+                        class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl hidden z-50 overflow-hidden">
+                        <a href="/logout"
+                            class="block px-4 py-3 text-sm text-red-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
+
+            <!-- ================= VIEW: DASHBOARD ================= -->
+            <div id="view-dashboard" class="view-section active space-y-6">
+                <!-- Filters -->
+                <div
+                    class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-slate-400"></i> Filter Dasbor
+                        </h3>
+                        <button onclick="resetFilters()"
+                            class="text-sm px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded text-lightAccent dark:text-darkAccent hover:bg-slate-200 dark:hover:bg-slate-700 transition">Reset
+                            Filter</button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Aset</label>
+                            <select id="filter-aset" onchange="applyFilters()"
+                                class="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm py-2 px-3 focus:outline-none">
+                                <option value="">Semua Aset</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Periode</label>
+                            <select id="filter-periode" onchange="applyFilters()"
+                                class="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm py-2 px-3 focus:outline-none">
+                                <option value="">Semua Periode</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Kategori</label>
+                            <select id="filter-kategori" onchange="applyFilters()"
+                                class="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm py-2 px-3 focus:outline-none">
+                                <option value="">Semua Kategori</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Lokasi</label>
+                            <select id="filter-lokasi" onchange="applyFilters()"
+                                class="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm py-2 px-3 focus:outline-none">
+                                <option value="">Semua Lokasi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Status</label>
+                            <select id="filter-status" onchange="applyFilters()"
+                                class="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm py-2 px-3 focus:outline-none">
+                                <option value="">Semua Status</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-lightAccent dark:text-darkAccent flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Perangkat</p>
+                            <p class="text-2xl font-bold mt-1" id="kpi-total">-</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Kategori</p>
+                            <p class="text-2xl font-bold mt-1" id="kpi-kategori">-</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-pink-50 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Lokasi</p>
+                            <p class="text-2xl font-bold mt-1" id="kpi-lokasi">-</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">In Use</p>
+                            <p class="text-2xl font-bold mt-1" id="kpi-inuse">-</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Repair</p>
+                            <p class="text-2xl font-bold mt-1" id="kpi-repair">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div
+                        class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Jumlah Perangkat by Kategori
+                        </h3>
+                        <div class="relative h-64"><canvas id="chartCategory"></canvas></div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Jumlah Perangkat by Lokasi
+                        </h3>
+                        <div class="relative flex-1 overflow-y-auto">
+                            <div class="w-full" id="chartLocationContainer" style="min-height:250px;"><canvas
+                                    id="chartLocation"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts 2 (Shorter height) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Perangkat by Aset
+                            (Area)</h3>
+                        <div class="relative h-48 flex justify-center"><canvas id="chartAset"></canvas></div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Tren Perangkat by
+                            Periode</h3>
+                        <div class="relative h-48"><canvas id="chartPeriod"></canvas></div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Persentase Kondisi
+                        </h3>
+                        <div class="relative h-48 flex justify-center"><canvas id="chartStatus"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div
+                        class="xl:col-span-2 bg-white dark:bg-darkCard rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div
+                            class="p-5 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between">
+                            <h3 class="font-semibold flex items-center gap-2"><i
+                                    class="fa-solid fa-triangle-exclamation text-orange-500"></i> Daftar Perangkat Rusak
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto flex-1 max-h-96">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead
+                                    class="text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/90 uppercase sticky top-0 z-10 backdrop-blur-sm">
+                                    <tr>
+                                        <th class="px-6 py-4">Aset</th>
+                                        <th class="px-6 py-4">Nama Device</th>
+                                        <th class="px-6 py-4">Periode</th>
+                                        <th class="px-6 py-4">Kategori</th>
+                                        <th class="px-6 py-4">S/N</th>
+                                        <th class="px-6 py-4">Lokasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body"
+                                    class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-700 dark:text-slate-300">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-darkCard rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                        <div class="p-5 border-b border-slate-200 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 class="font-semibold">Pengaduan Open Teratas</h3>
+                        </div>
+                        <div class="p-5 flex-1 space-y-3 overflow-y-auto max-h-96" id="dashboard-complaints"></div>
+                        <div class="p-3 border-t border-slate-200"><button onclick="switchView('pengaduan')"
+                                class="w-full text-sm text-lightAccent font-medium hover:underline">Kelola Semua
+                                Pengaduan</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: PENGADUAN ================= -->
+            <div id="view-pengaduan" class="view-section space-y-6">
+                <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Sistem Manajemen Pengaduan</h2>
+                        <button onclick="openComplaintModal()"
+                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
+                            <i class="fa-solid fa-plus mr-1"></i> Buat Pengaduan
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs uppercase bg-slate-50 dark:bg-slate-800">
+                                <tr>
+                                    <th class="px-4 py-3">ID</th>
+                                    <th class="px-4 py-3">Judul Pengaduan</th>
+                                    <th class="px-4 py-3">Lokasi</th>
+                                    <th class="px-4 py-3">Serial Number</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaints-tbody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: DATA PERANGKAT ================= -->
+            <div id="view-data" class="view-section space-y-6">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col h-[calc(100vh-140px)]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Data Lengkap Perangkat CSV</h2>
+                        {% if role == 'admin' %}
+                        <button onclick="openDeviceModal()"
+                            class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
+                            <i class="fa-solid fa-plus mr-1"></i> Tambah Perangkat
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="overflow-auto flex-1 border border-slate-200 rounded-lg">
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="text-xs uppercase bg-slate-100 dark:bg-slate-800 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-4 py-3">Aset</th>
+                                    <th class="px-4 py-3">Period</th>
+                                    <th class="px-4 py-3">Device Model</th>
+                                    <th class="px-4 py-3">Category</th>
+                                    <th class="px-4 py-3">S/N</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Location</th>
+                                    {% if role == 'admin' %}<th class="px-4 py-3 text-right">Aksi</th>{% endif %}
+                                </tr>
+                            </thead>
+                            <tbody id="all-devices-tbody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: PENGATURAN ================= -->
+            <div id="view-pengaturan" class="view-section space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Profile Card -->
+                    <div
+                        class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center text-center">
+                        <img src="https://ui-avatars.com/api/?name={{ name }}&background=3B82F6&color=fff&size=96"
+                            class="w-24 h-24 rounded-full border-4 border-blue-100 dark:border-slate-700 shadow mb-4"
+                            alt="Avatar">
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white">{{ name }}</h2>
+                        <span
+                            class="mt-1 px-3 py-1 rounded-full text-xs font-bold uppercase
+                            {% if role == 'admin' %}bg-blue-100 text-blue-700{% else %}bg-slate-100 text-slate-600{% endif %}">
+                            {{ role }}
+                        </span>
+                        <p class="text-sm text-slate-500 mt-3">Pertamina Zona 1 & Field Jambi<br>Dashboard Inventaris
+                            Multimedia</p>
+                        <a href="/logout"
+                            class="mt-5 w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-semibold transition"><i
+                                class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out</a>
+                    </div>
+
+                    <!-- Pengaturan Tampilan -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div
+                            class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+                            <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 mb-4"><i
+                                    class="fa-solid fa-palette mr-2 text-lightAccent"></i>Tampilan</h3>
+                            <div
+                                class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700">
+                                <div>
+                                    <p class="text-sm font-medium">Mode Gelap</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Aktifkan tema gelap untuk tampilan malam
+                                    </p>
+                                </div>
+                                <button onclick="toggleDarkMode()"
+                                    class="px-4 py-1.5 bg-slate-100 dark:bg-slate-700 rounded-full text-sm font-semibold hover:opacity-80 transition">
+                                    <span id="setting-theme-label" class="dark:hidden">Aktifkan</span>
+                                    <span class="hidden dark:inline">Nonaktifkan</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <div>
+                                    <p class="text-sm font-medium">Bahasa Antarmuka</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Bahasa yang digunakan pada dasbor</p>
+                                </div>
+                                <span
+                                    class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">Indonesia</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+                            <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 mb-4"><i
+                                    class="fa-solid fa-database mr-2 text-purple-500"></i>Data & Sumber</h3>
+                            <div
+                                class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700">
+                                <div>
+                                    <p class="text-sm font-medium">Sumber Data</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">File CSV inventaris aktif</p>
+                                </div>
+                                <span
+                                    class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">data.csv</span>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <div>
+                                    <p class="text-sm font-medium">Refresh Data</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Muat ulang seluruh data dari sumber</p>
+                                </div>
+                                <button
+                                    onclick="optionsPopulated=false; fetchAllData(); alert('Data berhasil diperbarui!')"
+                                    class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-sm font-semibold transition">
+                                    <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+                            <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 mb-4"><i
+                                    class="fa-solid fa-circle-info mr-2 text-pink-500"></i>Informasi Sistem</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between"><span class="text-slate-500">Versi Dasbor</span><span
+                                        class="font-semibold">v2.0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Framework
+                                        Backend</span><span class="font-semibold">Python Flask</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Visualisasi</span><span
+                                        class="font-semibold">Chart.js + DataLabels</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Area Coverage</span><span
+                                        class="font-semibold">Zona 1 & Field Jambi</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- CRUD Data Perangkat Modal (Admin Only) -->
+    <div id="deviceModal" class="fixed inset-0 modal-bg z-[60] hidden flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg" id="deviceModalTitle">Tambah Perangkat Baru</h3>
+                <button onclick="closeDeviceModal()" class="text-slate-400 hover:text-slate-600"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <form id="deviceForm" onsubmit="handleDeviceSubmit(event)">
+                    <input type="hidden" id="dev-mode" value="add">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Dropdowns for most fields -->
+                        <div><label class="block text-xs font-bold mb-1">Aset</label><select id="dev-aset"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2"></select>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Periode</label><select id="dev-period"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2"></select>
+                        </div>
+                        <!-- Text Input for Model -->
+                        <div class="col-span-2"><label class="block text-xs font-bold mb-1">Device Model</label><input
+                                required type="text" id="dev-model"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 text-slate-800 outline-none focus:ring-2">
+                        </div>
+                        <!-- Dropdowns -->
+                        <div><label class="block text-xs font-bold mb-1">Category</label><select id="dev-cat"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2"></select>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Serial Number</label><input required
+                                type="text" id="dev-sn"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 text-slate-800 outline-none focus:ring-2">
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Status</label><select id="dev-status"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2"></select>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Location</label><select id="dev-loc"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2"></select>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" onclick="closeDeviceModal()"
+                            class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Batal</button>
+                        <button type="submit"
+                            class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded shadow">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Complaint Modal -->
+    <div id="complaintModal" class="fixed inset-0 modal-bg z-[60] hidden flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg">Buat Pengaduan</h3>
+                <button onclick="closeComplaintModal()" class="text-slate-400 hover:text-slate-600"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <form onsubmit="handleComplaintSubmit(event)">
+                    <div class="space-y-3">
+                        <!-- Step 1: Select device from dropdown -->
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Pilih Perangkat <span
+                                    class="text-red-500">*</span></label>
+                            <select required id="comp-device-select" onchange="onComplaintDeviceSelect()"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600">
+                                <option value="">-- Pilih Perangkat --</option>
+                            </select>
+                        </div>
+                        <!-- Auto-filled info after device selected -->
+                        <div id="comp-device-info"
+                            class="hidden bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs space-y-1">
+                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Model:</span> <span
+                                    id="comp-info-model" class="font-mono"></span></p>
+                            <p><span class="font-bold text-slate-600 dark:text-slate-300">S/N:</span> <span
+                                    id="comp-info-sn" class="font-mono"></span></p>
+                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Lokasi:</span> <span
+                                    id="comp-info-loc"></span></p>
+                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Status Saat Ini:</span> <span
+                                    id="comp-info-status" class="font-bold"></span></p>
+                        </div>
+                        <!-- Hidden fields injected from selection -->
+                        <input type="hidden" id="comp-sn">
+                        <!-- Lokasi dropdown -->
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Lokasi Pengaduan <span
+                                    class="text-red-500">*</span></label>
+                            <select required id="comp-loc"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600">
+                                <option value="">-- Pilih Lokasi --</option>
+                            </select>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Deskripsi Masalah <span
+                                    class="text-red-500">*</span></label><textarea required id="comp-title" rows="2"
+                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600"
+                                placeholder="Cth: Proyektor tidak menyala, layar blur, dll..."></textarea></div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <input type="checkbox" id="comp-urgent" class="w-4 h-4 text-blue-600 rounded">
+                            <label for="comp-urgent"
+                                class="text-sm font-medium text-slate-700 dark:text-slate-300">Tandai Mendesak
+                                (Urgent)</label>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" onclick="closeComplaintModal()"
+                            class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Batal</button>
+                        <button type="submit"
+                            class="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded shadow">Kirim
+                            Pengaduan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-Screen Device Search Modal -->
+    <div id="searchModal" class="fixed inset-0 modal-bg z-[70] hidden flex items-center justify-center p-4"
+        onclick="closeSearchModal(event)">
+        <div
+            class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-16 h-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-3xl">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <div>
+                            <p class="text-blue-100 text-xs uppercase font-bold tracking-wider">Detail Perangkat</p>
+                            <h2 id="sm-model" class="text-xl font-bold mt-1">-</h2>
+                            <p id="sm-sn" class="text-blue-200 text-sm font-mono mt-1">-</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('searchModal').classList.add('hidden')"
+                        class="text-white/70 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="mt-4">
+                    <span id="sm-status-badge"
+                        class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase"></span>
+                </div>
+            </div>
+            <div class="p-6 grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div
+                        class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+                        <i class="fa-solid fa-layer-group text-sm"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500">Kategori</p>
+                        <p id="sm-category" class="font-semibold text-sm">-</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div
+                        class="w-9 h-9 rounded-lg bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center text-pink-600">
+                        <i class="fa-solid fa-location-dot text-sm"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500">Lokasi</p>
+                        <p id="sm-location" class="font-semibold text-sm">-</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div
+                        class="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600">
+                        <i class="fa-solid fa-map text-sm"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500">Aset / Area</p>
+                        <p id="sm-aset" class="font-semibold text-sm">-</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div
+                        class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600">
+                        <i class="fa-solid fa-calendar text-sm"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500">Periode</p>
+                        <p id="sm-period" class="font-semibold text-sm">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const userRole = document.body.getAttribute('data-role');
+        let fullData = null;
+        // --- Layout & View Logic ---
+        let sidebarCollapsed = false;
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const toggleIcon = document.querySelector('#sidebar-toggle-btn i');
+            const logoText = document.querySelector('.logo-text');
+            const navTexts = document.querySelectorAll('.nav-text');
+
+            if (window.innerWidth < 768) {
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden');
+                }
+            } else {
+                sidebarCollapsed = !sidebarCollapsed;
+                if (sidebarCollapsed) {
+                    sidebar.classList.remove('w-64'); sidebar.classList.add('w-20');
+                    logoText.classList.add('hidden'); navTexts.forEach(t => t.classList.add('hidden'));
+                    toggleIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    sidebar.classList.remove('w-20'); sidebar.classList.add('w-64');
+                    logoText.classList.remove('hidden'); navTexts.forEach(t => t.classList.remove('hidden'));
+                    toggleIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            }
+        }
+
+        function switchView(viewId, element = null) {
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); element.classList.add('active');
+            } else {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const links = document.querySelectorAll('.nav-item');
+                for (let l of links) if (l.getAttribute('onclick').includes(viewId)) { l.classList.add('active'); break; }
+            }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            if (window.innerWidth < 768) toggleSidebar();
+        }
+
+        function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
+        async function openNotifications() {
+            const dot = document.getElementById('notif-dot');
+            const badge = document.getElementById('notif-badge');
+            dot.classList.add('hidden');
+            badge.classList.add('hidden');
+            document.getElementById('notifDropdown').classList.toggle('hidden');
+            // Mark as read on server
+            await fetch('/api/notifications/read', { method: 'POST' });
+        }
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark'); localStorage.setItem('theme', 'light');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon'; document.getElementById('theme-text').textContent = 'Mode Gelap';
+            } else {
+                html.classList.add('dark'); localStorage.setItem('theme', 'dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun text-amber-400'; document.getElementById('theme-text').textContent = 'Mode Terang';
+            }
+            updateChartColors();
+        }
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').className = 'fa-solid fa-sun text-amber-400'; document.getElementById('theme-text').textContent = 'Mode Terang';
+        } else document.documentElement.classList.remove('dark');
+
+        // --- Core Data Logic ---
+        let dashboardCharts = {};
+        let optionsPopulated = false;
+
+        async function fetchAllData() {
+            try {
+                const params = new URLSearchParams();
+                ['kategori', 'lokasi', 'status', 'aset', 'periode'].forEach(f => {
+                    const val = document.getElementById(`filter-${f}`).value;
+                    if (val) params.append(f, val);
+                });
+
+                const [dataRes, compRes] = await Promise.all([fetch('/api/data?' + params.toString()), fetch('/api/complaints')]);
+                const data = await dataRes.json();
+                const complaintsData = await compRes.json();
+                fullData = data;
+
+                // Update notification badge
+                const unread = complaintsData.unread_count || 0;
+                const dot = document.getElementById('notif-dot');
+                const badge = document.getElementById('notif-badge');
+                if (unread > 0) {
+                    dot.classList.remove('hidden');
+                    badge.textContent = unread > 9 ? '9+' : unread;
+                    badge.classList.remove('hidden');
+                } else {
+                    dot.classList.add('hidden');
+                    badge.classList.add('hidden');
+                }
+
+                // Populate notification list in dropdown
+                const notifList = document.getElementById('notif-list');
+                const items = complaintsData.notif_items || [];
+                document.getElementById('notif-count-label').textContent = items.length > 0 ? `${items.length} notifikasi` : '';
+                if (items.length === 0) {
+                    notifList.innerHTML = '<p class="text-xs text-slate-500 text-center py-6">Belum ada notifikasi.</p>';
+                } else {
+                    notifList.innerHTML = items.map(n => `
+                        <div class="flex gap-3 items-start px-4 py-3 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-solid fa-bullhorn text-orange-500 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium">${n.text}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">${n.location || ''} ${n.serial ? '• SN: ' + n.serial : ''}</p>
+                                ${n.urgent ? '<span class="text-[10px] font-bold bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded uppercase">Mendesak</span>' : ''}
+                            </div>
+                        </div>`).join('');
+                }
+
+                renderDashboard(data, complaintsData.complaints);
+                renderDataPerangkat(data.all_devices);
+                renderPengaduanView(complaintsData.all);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderDashboard(data, openComplaints) {
+            if (!optionsPopulated && data.filter_options) {
+                const populate = (id, arr) => {
+                    const sel = document.getElementById(id); const val = sel.value;
+                    sel.innerHTML = `<option value="">Semua ${id.split('-')[1]}</option>`;
+                    arr.forEach(i => {
+                        const opt = document.createElement('option'); opt.value = i; opt.textContent = i;
+                        if (i === val) opt.selected = true; sel.appendChild(opt);
+                    });
+                };
+                populate('filter-kategori', data.filter_options.kategori);
+                populate('filter-lokasi', data.filter_options.lokasi);
+                populate('filter-status', data.filter_options.status);
+                populate('filter-aset', data.filter_options.aset);
+                populate('filter-periode', data.filter_options.periode);
+                optionsPopulated = true;
+            }
+
+            document.getElementById('kpi-total').textContent = data.kpis.total_perangkat;
+            document.getElementById('kpi-kategori').textContent = data.kpis.total_kategori;
+            document.getElementById('kpi-lokasi').textContent = data.kpis.total_lokasi;
+            document.getElementById('kpi-inuse').textContent = data.kpis.in_use;
+            document.getElementById('kpi-repair').textContent = data.kpis.repair;
+
+            const tbody = document.getElementById('table-body'); tbody.innerHTML = '';
+            if (data.table && data.table.length > 0) {
+                data.table.forEach(row => {
+                    tbody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td class="px-6 py-4">${row.Aset}</td><td class="px-6 py-4 font-medium">${row['Nama Device']}</td><td class="px-6 py-4">${row.Period}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs">${row.Category}</span></td>
+                        <td class="px-6 py-4 font-mono text-xs">${row['Serial Number']}</td><td class="px-6 py-4">${row.Location}</td>
+                    </tr>`;
+                });
+            } else tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">Kondisi Aman.</td></tr>`;
+
+            const widgetC = document.getElementById('dashboard-complaints'); widgetC.innerHTML = '';
+            if (openComplaints.length > 0) {
+                openComplaints.slice(0, 3).forEach(c => {
+                    widgetC.innerHTML += `
+                    <div class="flex gap-4 items-start p-3 rounded-lg ${c.urgent ? 'bg-lightUrgent dark:bg-darkUrgent/20 border border-orange-200' : 'hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent'}">
+                        <div class="w-2 h-2 mt-2 rounded-full ${c.urgent ? 'bg-orange-500' : 'bg-slate-300 dark:bg-slate-600'} flex-shrink-0"></div>
+                        <div><p class="text-sm font-medium">${c.title}</p><p class="text-xs text-slate-500 mt-1">${c.location} • SN: ${c.serial || '-'}</p></div>
+                    </div>`;
+                });
+            } else widgetC.innerHTML = `<p class="text-sm text-slate-500 text-center py-4">Semua pengaduan selesai.</p>`;
+
+            renderCharts(data.charts);
+        }
+
+        function renderDataPerangkat(devices) {
+            const tb = document.getElementById('all-devices-tbody'); tb.innerHTML = '';
+            devices.forEach(d => {
+                let badgeClass = d.Status === 'Repair' ? 'bg-orange-100 text-orange-700' : (d.Status === 'In Use' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700');
+                let actions = '';
+                if (userRole === 'admin') actions = `<td class="px-4 py-3 text-right"><button onclick="editDevice('${d['Serial Number']}')" class="text-blue-500 hover:text-blue-700 mx-1 p-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteDevice('${d['Serial Number']}')" class="text-red-500 hover:text-red-700 mx-1 p-1"><i class="fa-solid fa-trash"></i></button></td>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800"><td class="px-4 py-3">${d.Aset}</td><td class="px-4 py-3">${d.Period}</td><td class="px-4 py-3 font-medium">${d['Device Model']}</td><td class="px-4 py-3">${d.Category}</td><td class="px-4 py-3 font-mono text-xs">${d['Serial Number']}</td><td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">${d.Status}</span></td><td class="px-4 py-3">${d.Location}</td>${actions}</tr>`;
+            });
+        }
+
+        function renderPengaduanView(complaints) {
+            const tb = document.getElementById('complaints-tbody'); tb.innerHTML = '';
+            complaints.forEach(c => {
+                let badge = c.status === 'Open' ? '<span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold">OPEN</span>' : '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">RESOLVED</span>';
+                let actions = '-';
+                if (c.status === 'Open' && userRole === 'admin') actions = `<button onclick="resolveComplaint(${c.id})" class="px-3 py-1 bg-emerald-500 text-white rounded hover:bg-emerald-600 text-xs font-bold">Selesaikan</button>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800"><td class="px-4 py-3">#${c.id}</td><td class="px-4 py-3 font-medium">${c.title} ${c.urgent ? '<i class="fa-solid fa-fire text-orange-500 ml-1"></i>' : ''}</td><td class="px-4 py-3">${c.location}</td><td class="px-4 py-3 font-mono text-xs">${c.serial || '-'}</td><td class="px-4 py-3">${badge}</td><td class="px-4 py-3 text-right">${actions}</td></tr>`;
+            });
+        }
+
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return { text: isDark ? '#94a3b8' : '#64748b', grid: isDark ? '#334155' : '#e2e8f0', accent: isDark ? '#38bdf8' : '#3b82f6', accentSec: isDark ? '#818cf8' : '#8b5cf6', accentTer: isDark ? '#f472b6' : '#ec4899', pieColors: ['#10b981', '#f97316'], labelColor: '#fff' };
+        }
+
+        function updateChartColors() {
+            const c = getChartColors();
+            Object.values(dashboardCharts).forEach(chart => {
+                if (chart && chart.options.scales && chart.options.scales.x) { chart.options.scales.x.ticks.color = c.text; chart.options.scales.x.grid.color = c.grid; chart.options.scales.y.ticks.color = c.text; chart.options.scales.y.grid.color = c.grid; }
+                if (chart && chart.options.plugins.legend) chart.options.plugins.legend.labels.color = c.text;
+                if (chart) chart.update();
+            });
+        }
+
+        function renderCharts(cData) {
+            const c = getChartColors(); const dlConfig = { color: c.labelColor, font: { weight: 'bold' } };
+            function createOrUpdate(key, id, config) { if (dashboardCharts[key]) dashboardCharts[key].destroy(); dashboardCharts[key] = new Chart(document.getElementById(id).getContext('2d'), config); }
+            createOrUpdate('cat', 'chartCategory', { type: 'bar', data: { labels: Object.keys(cData.kategori), datasets: [{ data: Object.values(cData.kategori), backgroundColor: c.accent, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: dlConfig }, scales: { y: { grid: { color: c.grid }, ticks: { color: c.text } }, x: { grid: { display: false }, ticks: { color: c.text, maxRotation: 45, minRotation: 45 } } } } });
+
+            const locKeys = Object.keys(cData.lokasi);
+            document.getElementById('chartLocationContainer').style.height = Math.max(250, locKeys.length * 30) + 'px';
+            createOrUpdate('loc', 'chartLocation', { type: 'bar', data: { labels: locKeys, datasets: [{ data: Object.values(cData.lokasi), backgroundColor: c.accentSec, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: dlConfig }, scales: { x: { grid: { color: c.grid }, ticks: { color: c.text } }, y: { grid: { display: false }, ticks: { color: c.text } } } } });
+
+            createOrUpdate('aset', 'chartAset', { type: 'doughnut', data: { labels: Object.keys(cData.aset), datasets: [{ data: Object.values(cData.aset), backgroundColor: [c.accent, c.accentTer, c.accentSec], borderWidth: 0, cutout: '70%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text, usePointStyle: true } }, datalabels: dlConfig } } });
+            createOrUpdate('status', 'chartStatus', { type: 'pie', data: { labels: Object.keys(cData.status), datasets: [{ data: Object.values(cData.status), backgroundColor: c.pieColors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text, usePointStyle: true } }, datalabels: dlConfig } } });
+            createOrUpdate('period', 'chartPeriod', { type: 'line', data: { labels: Object.keys(cData.periode), datasets: [{ data: Object.values(cData.periode), borderColor: c.accentTer, backgroundColor: c.accentTer + '33', fill: true, tension: 0.4, pointBackgroundColor: c.accentTer }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: false } }, scales: { y: { grid: { color: c.grid }, ticks: { color: c.text } }, x: { grid: { display: false }, ticks: { color: c.text } } } } });
+        }
+
+        function applyFilters() { fetchAllData(); }
+        function resetFilters() { ['kategori', 'lokasi', 'status', 'aset', 'periode'].forEach(f => document.getElementById('filter-' + f).value = ""); fetchAllData(); }
+
+        // --- Complaint Logic ---
+        function openComplaintModal() {
+            // Populate device dropdown
+            if (fullData && fullData.device_list) {
+                const sel = document.getElementById('comp-device-select');
+                sel.innerHTML = '<option value="">-- Pilih Perangkat --</option>';
+                fullData.device_list.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d['Serial Number'];
+                    opt.textContent = `${d['Device Model']} (${d['Serial Number']})`;
+                    opt.dataset.model = d['Device Model'];
+                    opt.dataset.sn = d['Serial Number'];
+                    opt.dataset.loc = d['Location'];
+                    opt.dataset.status = d['Status'];
+                    opt.dataset.aset = d['Aset'];
+                    sel.appendChild(opt);
+                });
+            }
+            // Populate location dropdown from filter_options
+            if (fullData && fullData.filter_options && fullData.filter_options.lokasi) {
+                const locSel = document.getElementById('comp-loc');
+                locSel.innerHTML = '<option value="">-- Pilih Lokasi --</option>';
+                fullData.filter_options.lokasi.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l; opt.textContent = l;
+                    locSel.appendChild(opt);
+                });
+            }
+            document.getElementById('comp-device-info').classList.add('hidden');
+            document.getElementById('comp-title').value = '';
+            document.getElementById('comp-urgent').checked = false;
+            document.getElementById('comp-sn').value = '';
+            document.getElementById('complaintModal').classList.remove('hidden');
+        }
+
+        function onComplaintDeviceSelect() {
+            const sel = document.getElementById('comp-device-select');
+            const opt = sel.selectedOptions[0];
+            if (!opt || !opt.value) {
+                document.getElementById('comp-device-info').classList.add('hidden');
+                document.getElementById('comp-sn').value = '';
+                return;
+            }
+            // Fill hidden serial
+            document.getElementById('comp-sn').value = opt.dataset.sn;
+            // Auto-set location to match device location
+            const locSel = document.getElementById('comp-loc');
+            if (locSel) {
+                for (let o of locSel.options) { if (o.value === opt.dataset.loc) { o.selected = true; break; } }
+            }
+            // Show device info preview
+            document.getElementById('comp-info-model').textContent = opt.dataset.model;
+            document.getElementById('comp-info-sn').textContent = opt.dataset.sn;
+            document.getElementById('comp-info-loc').textContent = opt.dataset.loc;
+            const statusEl = document.getElementById('comp-info-status');
+            statusEl.textContent = opt.dataset.status;
+            statusEl.className = opt.dataset.status === 'Repair' ? 'font-bold text-orange-600' : 'font-bold text-emerald-600';
+            document.getElementById('comp-device-info').classList.remove('hidden');
+        }
+
+        function closeComplaintModal() { document.getElementById('complaintModal').classList.add('hidden'); }
+
+        async function handleComplaintSubmit(e) {
+            e.preventDefault();
+            const sel = document.getElementById('comp-device-select');
+            const opt = sel.selectedOptions[0];
+            const payload = {
+                title: document.getElementById('comp-title').value,
+                location: document.getElementById('comp-loc').value,
+                serial: document.getElementById('comp-sn').value,
+                device_name: opt ? opt.dataset.model : '',
+                urgent: document.getElementById('comp-urgent').checked
+            };
+            const res = await fetch('/api/complaints', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (res.ok) {
+                closeComplaintModal(); fetchAllData(); alert("Pengaduan terkirim!");
+            }
+        }
+        async function resolveComplaint(id) {
+            if (!confirm("Tandai pengaduan selesai? Status barang otomatis diubah ke 'In Use'.")) return;
+            const res = await fetch('/api/complaints', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
+            if (res.ok) { optionsPopulated = false; fetchAllData(); }
+        }
+
+        // --- Search ---
+        async function handleSearch() {
+            const q = document.getElementById('searchInput').value;
+            const resDiv = document.getElementById('searchResults');
+            if (q.length < 2) { resDiv.classList.add('hidden'); return; }
+            const items = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
+            resDiv.innerHTML = '';
+            if (items.length === 0) {
+                resDiv.innerHTML = '<div class="p-4 text-sm text-slate-500">Tidak ada hasil.</div>';
+            } else {
+                items.forEach(i => {
+                    let stClr = i.Status === 'Repair' ? 'text-orange-500' : 'text-emerald-500';
+                    const el = document.createElement('div');
+                    el.className = 'p-3 border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer';
+                    el.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-bold text-sm">${i['Device Model']}</p><p class="text-xs text-slate-500 font-mono">${i['Serial Number']}</p></div><span class="text-xs font-bold ${stClr} uppercase">${i.Status}</span></div>`;
+                    el.onclick = () => openSearchModal(i);
+                    resDiv.appendChild(el);
+                });
+            }
+            resDiv.classList.remove('hidden');
+        }
+
+        function openSearchModal(device) {
+            const modal = document.getElementById('searchModal');
+            document.getElementById('sm-model').textContent = device['Device Model'] || '-';
+            document.getElementById('sm-sn').textContent = 'S/N: ' + (device['Serial Number'] || '-');
+            document.getElementById('sm-category').textContent = device['Category'] || '-';
+            document.getElementById('sm-location').textContent = device['Location'] || '-';
+            document.getElementById('sm-aset').textContent = device['Aset'] || '-';
+            document.getElementById('sm-period').textContent = device['Period'] || '-';
+            const badge = document.getElementById('sm-status-badge');
+            badge.textContent = device['Status'] || '-';
+            badge.className = device['Status'] === 'Repair'
+                ? 'inline-block px-3 py-1 rounded-full text-xs font-bold uppercase bg-orange-500 text-white'
+                : 'inline-block px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-500 text-white';
+            document.getElementById('searchResults').classList.add('hidden');
+            modal.classList.remove('hidden');
+        }
+
+        function closeSearchModal(e) {
+            if (e.target === document.getElementById('searchModal')) {
+                document.getElementById('searchModal').classList.add('hidden');
+            }
+        }
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) document.getElementById('searchResults').classList.add('hidden');
+            if (!e.target.closest('#notifDropdown') && !e.target.closest('[onclick="openNotifications()"]')) document.getElementById('notifDropdown').classList.add('hidden');
+            if (!e.target.closest('#userMenu') && !e.target.closest('[onclick="toggleUserMenu()"]')) document.getElementById('userMenu').classList.add('hidden');
+        });
+
+        // --- Modals (CRUD) ---
+        function populateModalDropdowns() {
+            if (!fullData || !fullData.filter_options) return;
+            // Build periode range: July 2026 - July 2027
+            const periodeRange = [
+                'July 2026', 'August 2026', 'September 2026', 'October 2026', 'November 2026', 'December 2026',
+                'January 2027', 'February 2027', 'March 2027', 'April 2027', 'May 2027', 'June 2027', 'July 2027'
+            ];
+            const buildOptions = (arr) => arr.map(i => `<option value="${i}">${i}</option>`).join('');
+            document.getElementById('dev-aset').innerHTML = buildOptions(fullData.filter_options.aset);
+            document.getElementById('dev-period').innerHTML = buildOptions(periodeRange);
+            document.getElementById('dev-cat').innerHTML = buildOptions(fullData.filter_options.kategori);
+            document.getElementById('dev-loc').innerHTML = buildOptions(fullData.filter_options.lokasi);
+            document.getElementById('dev-status').innerHTML = buildOptions(fullData.filter_options.status);
+        }
+
+        function openDeviceModal() {
+            document.getElementById('dev-mode').value = 'add';
+            document.getElementById('deviceModalTitle').textContent = "Tambah Perangkat Baru";
+            document.getElementById('deviceForm').reset();
+            document.getElementById('dev-sn').disabled = false;
+            populateModalDropdowns();
+            document.getElementById('deviceModal').classList.remove('hidden');
+        }
+
+        function closeDeviceModal() { document.getElementById('deviceModal').classList.add('hidden'); }
+
+        function editDevice(sn) {
+            const dev = fullData.all_devices.find(d => d['Serial Number'] === sn);
+            if (!dev) return;
+            populateModalDropdowns();
+            document.getElementById('dev-mode').value = 'edit';
+            document.getElementById('deviceModalTitle').textContent = "Edit Perangkat";
+
+            document.getElementById('dev-aset').value = dev.Aset;
+            document.getElementById('dev-period').value = dev.Period;
+            document.getElementById('dev-model').value = dev['Device Model'];
+            document.getElementById('dev-cat').value = dev.Category;
+            document.getElementById('dev-sn').value = dev['Serial Number'];
+            document.getElementById('dev-sn').disabled = true;
+            document.getElementById('dev-status').value = dev.Status;
+            document.getElementById('dev-loc').value = dev.Location;
+
+            document.getElementById('deviceModal').classList.remove('hidden');
+        }
+
+        async function deleteDevice(sn) {
+            if (!confirm("Yakin hapus perangkat ini?")) return;
+            const res = await fetch('/api/devices', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ 'Serial Number': sn }) });
+            if (res.ok) fetchAllData();
+        }
+
+        async function handleDeviceSubmit(e) {
+            e.preventDefault();
+            const payload = {
+                'Aset': document.getElementById('dev-aset').value, 'Period': document.getElementById('dev-period').value,
+                'Device Model': document.getElementById('dev-model').value, 'Category': document.getElementById('dev-cat').value,
+                'Serial Number': document.getElementById('dev-sn').value, 'Status': document.getElementById('dev-status').value,
+                'Location': document.getElementById('dev-loc').value
+            };
+            const method = document.getElementById('dev-mode').value === 'add' ? 'POST' : 'PUT';
+            const res = await fetch('/api/devices', { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (res.ok) { closeDeviceModal(); optionsPopulated = false; fetchAllData(); }
+            else alert("Gagal menyimpan.");
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchAllData);
+    </script>
+</body>
+
+</html>

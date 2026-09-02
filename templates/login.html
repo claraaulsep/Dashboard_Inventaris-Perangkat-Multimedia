@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Inventaris</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        lightBg: '#F9FAFC', lightAccent: '#3B82F6',
+                        darkBg: '#0F172A', darkCard: '#1E293B', darkAccent: '#38BDF8'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center font-sans">
+
+    <div
+        class="bg-white dark:bg-darkCard p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200 dark:border-slate-700">
+        <div class="text-center mb-8">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-lightAccent dark:text-darkAccent text-3xl mb-4">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">PT PERTAMINA</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Dashboard Inventaris Multimedia</p>
+        </div>
+
+        <form action="/login" method="POST" class="space-y-6">
+            {% if error %}
+            <div
+                class="p-3 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Username</label>
+                <div class="relative">
+                    <input type="text" name="username" required
+                        class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-lightAccent dark:focus:ring-darkAccent transition-all text-sm"
+                        placeholder="Masukkan username">
+                    <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Password</label>
+                <div class="relative">
+                    <input type="password" name="password" required
+                        class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-lightAccent dark:focus:ring-darkAccent transition-all text-sm"
+                        placeholder="••••••••">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full py-2.5 px-4 bg-lightAccent dark:bg-darkAccent hover:bg-blue-600 dark:hover:bg-sky-400 text-white font-medium rounded-lg shadow-sm transition-colors text-sm">
+                Sign In
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
+            <p>Demo Accounts:</p>
+            <p>Admin: admin / 123</p>
+            <p>Tamu: tamu / 123</p>
+        </div>
+    </div>
+
+    <!-- Theme Initialization Script (keeps theme consistent on login screen) -->
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body>
+
+</html>

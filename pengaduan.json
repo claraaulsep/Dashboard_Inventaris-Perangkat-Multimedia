@@ -1,0 +1,442 @@
+[
+    {
+        "id": 1,
+        "title": "Masalah: Display Interactive TV 65 Inch with bracket rusak",
+        "location": "Cut Nyak Dien Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070003",
+        "device_name": "Display Interactive TV 65 Inch with bracket"
+    },
+    {
+        "id": 2,
+        "title": "Masalah: Display Interactive TV 65 Inch with bracket rusak",
+        "location": "Klinik Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070007",
+        "device_name": "Display Interactive TV 65 Inch with bracket"
+    },
+    {
+        "id": 3,
+        "title": "Masalah: Crestron HD-TXC-4KZ-101 HDMI Extender TX rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070038",
+        "device_name": "Crestron HD-TXC-4KZ-101 HDMI Extender TX"
+    },
+    {
+        "id": 4,
+        "title": "Masalah: Crestron HD-RXC-4KZ-101 HDMI Extender RX rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070039",
+        "device_name": "Crestron HD-RXC-4KZ-101 HDMI Extender RX"
+    },
+    {
+        "id": 5,
+        "title": "Masalah: Arec Katov KT-KD10 AV Processor - HDMI Switcher rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070040",
+        "device_name": "Arec Katov KT-KD10 AV Processor - HDMI Switcher"
+    },
+    {
+        "id": 6,
+        "title": "Masalah: Yamaha VXL1-16 Speaker Slim Line Array rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070042",
+        "device_name": "Yamaha VXL1-16 Speaker Slim Line Array"
+    },
+    {
+        "id": 7,
+        "title": "Masalah: Yamaha VXL1-16 Speaker Slim Line Array rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070043",
+        "device_name": "Yamaha VXL1-16 Speaker Slim Line Array"
+    },
+    {
+        "id": 8,
+        "title": "Masalah: Yamaha XMV4280 Amplifier Main Speaker rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070044",
+        "device_name": "Yamaha XMV4280 Amplifier Main Speaker"
+    },
+    {
+        "id": 9,
+        "title": "Masalah: Audinate Dante Analog To Network Adapter rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070045",
+        "device_name": "Audinate Dante Analog To Network Adapter"
+    },
+    {
+        "id": 10,
+        "title": "Masalah: Netgear GS308EPP PoE Switch 8 port rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070046",
+        "device_name": "Netgear GS308EPP PoE Switch 8 port"
+    },
+    {
+        "id": 11,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070047",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1)"
+    },
+    {
+        "id": 12,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070048",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2)"
+    },
+    {
+        "id": 13,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070049",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3)"
+    },
+    {
+        "id": 14,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070050",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4)"
+    },
+    {
+        "id": 15,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070051",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5)"
+    },
+    {
+        "id": 16,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070052",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6)"
+    },
+    {
+        "id": 17,
+        "title": "Masalah: Shure SBC850-E Dual Docking Charging Station rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070053",
+        "device_name": "Shure SBC850-E Dual Docking Charging Station"
+    },
+    {
+        "id": 18,
+        "title": "Masalah: Shure MXA920W + A910-HCM Ceiling Mic & Frame (1) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070054",
+        "device_name": "Shure MXA920W + A910-HCM Ceiling Mic & Frame (1)"
+    },
+    {
+        "id": 19,
+        "title": "Masalah: Shure MXA920W + A910-HCM Ceiling Mic & Frame (2) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070055",
+        "device_name": "Shure MXA920W + A910-HCM Ceiling Mic & Frame (2)"
+    },
+    {
+        "id": 20,
+        "title": "Masalah: Shure ULXD4QE Wireless Receiver Mic (1) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070056",
+        "device_name": "Shure ULXD4QE Wireless Receiver Mic (1)"
+    },
+    {
+        "id": 21,
+        "title": "Masalah: Shure ULXD4QE Wireless Receiver Mic (2) rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070057",
+        "device_name": "Shure ULXD4QE Wireless Receiver Mic (2)"
+    },
+    {
+        "id": 22,
+        "title": "Masalah: Shure P300-IMX Conference Audio Controller rusak",
+        "location": "General Manager Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070058",
+        "device_name": "Shure P300-IMX Conference Audio Controller"
+    },
+    {
+        "id": 23,
+        "title": "Masalah: Crestron HD-TXC-4KZ-101 HDMI Extender TX rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070109",
+        "device_name": "Crestron HD-TXC-4KZ-101 HDMI Extender TX"
+    },
+    {
+        "id": 24,
+        "title": "Masalah: Crestron HD-RXC-4KZ-101 HDMI Extender RX rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070110",
+        "device_name": "Crestron HD-RXC-4KZ-101 HDMI Extender RX"
+    },
+    {
+        "id": 25,
+        "title": "Masalah: Arec Katov KT-KD10 AV Processor - HDMI Switcher rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070111",
+        "device_name": "Arec Katov KT-KD10 AV Processor - HDMI Switcher"
+    },
+    {
+        "id": 26,
+        "title": "Masalah: Yamaha VXL1-16 Speaker Slim Line Array rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070113",
+        "device_name": "Yamaha VXL1-16 Speaker Slim Line Array"
+    },
+    {
+        "id": 27,
+        "title": "Masalah: Yamaha VXL1-16 Speaker Slim Line Array rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070114",
+        "device_name": "Yamaha VXL1-16 Speaker Slim Line Array"
+    },
+    {
+        "id": 28,
+        "title": "Masalah: Yamaha XMV4280 Amplifier Main Speaker rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070115",
+        "device_name": "Yamaha XMV4280 Amplifier Main Speaker"
+    },
+    {
+        "id": 29,
+        "title": "Masalah: Audinate Dante Analog To Network Adapter rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070116",
+        "device_name": "Audinate Dante Analog To Network Adapter"
+    },
+    {
+        "id": 30,
+        "title": "Masalah: Netgear GS308EPP PoE Switch 8 port rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070117",
+        "device_name": "Netgear GS308EPP PoE Switch 8 port"
+    },
+    {
+        "id": 31,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070118",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1)"
+    },
+    {
+        "id": 32,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070119",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2)"
+    },
+    {
+        "id": 33,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070120",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3)"
+    },
+    {
+        "id": 34,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070121",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4)"
+    },
+    {
+        "id": 35,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070122",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5)"
+    },
+    {
+        "id": 36,
+        "title": "Masalah: Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070123",
+        "device_name": "Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6)"
+    },
+    {
+        "id": 37,
+        "title": "Masalah: Shure SBC850-E Dual Docking Charging Station rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070124",
+        "device_name": "Shure SBC850-E Dual Docking Charging Station"
+    },
+    {
+        "id": 38,
+        "title": "Masalah: Shure MXA920W + A910-HCM Ceiling Mic & Frame (1) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070125",
+        "device_name": "Shure MXA920W + A910-HCM Ceiling Mic & Frame (1)"
+    },
+    {
+        "id": 39,
+        "title": "Masalah: Shure MXA920W + A910-HCM Ceiling Mic & Frame (2) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070126",
+        "device_name": "Shure MXA920W + A910-HCM Ceiling Mic & Frame (2)"
+    },
+    {
+        "id": 40,
+        "title": "Masalah: Shure ULXD4QE Wireless Receiver Mic (1) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070127",
+        "device_name": "Shure ULXD4QE Wireless Receiver Mic (1)"
+    },
+    {
+        "id": 41,
+        "title": "Masalah: Shure ULXD4QE Wireless Receiver Mic (2) rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070128",
+        "device_name": "Shure ULXD4QE Wireless Receiver Mic (2)"
+    },
+    {
+        "id": 42,
+        "title": "Masalah: Shure P300-IMX Conference Audio Controller rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070129",
+        "device_name": "Shure P300-IMX Conference Audio Controller"
+    },
+    {
+        "id": 43,
+        "title": "Masalah: Crestron TSS-1070-B-S-LB KIT Display Booking rusak",
+        "location": "Teuku Umar Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Zona",
+        "serial": "MMD202608070131",
+        "device_name": "Crestron TSS-1070-B-S-LB KIT Display Booking"
+    },
+    {
+        "id": 44,
+        "title": "Masalah: TV rusak",
+        "location": " Supply Chain Management Meeting Room",
+        "urgent": false,
+        "status": "Open",
+        "asset": "Field",
+        "serial": "27910i2n21",
+        "device_name": "TV"
+    }
+]
