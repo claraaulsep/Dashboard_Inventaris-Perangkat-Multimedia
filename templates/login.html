@@ -29,17 +29,22 @@
 <body
     class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center font-sans">
 
-    <div
-        class="bg-white dark:bg-darkCard p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200 dark:border-slate-700">
+    <div class="bg-white dark:bg-darkCard p-8 shadow-xl w-full max-w-md ">
         <div class="text-center mb-8">
             <div
-                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-lightAccent dark:text-darkAccent text-3xl mb-4">
-                <i class="fa-solid fa-fire"></i>
+                class="inline-flex items-center justify-center w-16 h-16 text-lightAccent dark:text-darkAccent text-3xl mb-4">
+                <div class="absolute top-40 left-15">
+                    <picture>
+                        <source srcset="{{ url_for('static', filename='lightmode.png') }}"
+                            media="(prefers-color-scheme: dark)">
+                        <img src="{{ url_for('static', filename='logopertamina.svg') }}" alt="Logo"
+                            style="width: 100px; height: auto;">
+                    </picture>
+                </div>
             </div>
-            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">PT PERTAMINA</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Dashboard Inventaris Multimedia</p>
+            <h1 class="text-lg text-slate-500 dark:text-slate-400 mt-1">PT Pertamina Hulu Rokan</h1>
+            <p class="text-base text-slate-500 dark:text-slate-400 mt-1">Dashboard Inventaris Multimedia</p>
         </div>
-
         <form action="/login" method="POST" class="space-y-6">
             {% if error %}
             <div

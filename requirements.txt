@@ -1,2 +1,6 @@
 flask
 pandas
+requests
+gunicorn
+supabase
+python-dotenv

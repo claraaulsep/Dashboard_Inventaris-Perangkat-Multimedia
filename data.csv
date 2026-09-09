@@ -1,35 +1,35 @@
 Aset;Period;Device Model;Category;Serial Number;Status;Location
-Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070001;In Use;Cut Mutia Meeting Room
-Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070002;In Use;Cut Mutia Meeting Room
+Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070001;Repair;Cut Mutia Meeting Room
+Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070002;Repair;Cut Mutia Meeting Room
 Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070003;Repair;Cut Nyak Dien Meeting Room
-Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070004;In Use;Cut Nyak Dien Meeting Room
-Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070005;In Use;Imam Bonjol Meeting Room
-Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070006;In Use;Imam Bonjol Meeting Room
+Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070004;Repair;Cut Nyak Dien Meeting Room
+Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070005;Repair;Imam Bonjol Meeting Room
+Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070006;Repair;Imam Bonjol Meeting Room
 Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070007;Repair;Klinik Meeting Room
 Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070008;In Use;Klinik Meeting Room
-Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070009;In Use;Aula Meeting Room
+Zona;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070009;Repair;Aula Meeting Room
 Zona;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070010;In Use;Aula Meeting Room
 Zona;July 2026;Hisense 100Q6N Display TV with Bracket Standing;Display;MMD202608070011;In Use;Aula Meeting Room
-Zona;July 2026;Crestron HD-TXC-4KZ-101 HDMI Extender TX;Video Extender;MMD202608070012;In Use;Aula Meeting Room
+Zona;July 2026;Crestron HD-TXC-4KZ-101 HDMI Extender TX;Video Extender;MMD202608070012;Repair;Aula Meeting Room
 Zona;July 2026;Crestron HD-TXC-4KZ-101 HDMI Extender RX;Video Extender;MMD202608070013;In Use;Aula Meeting Room
 Zona;July 2026;Arec Katov KT-KD10 AV Processor - HDMI Switcher;Audio Processor;MMD202608070014;In Use;Aula Meeting Room
-Zona;July 2026;Aver Cam 570 Camera for Conference;Camera;MMD202608070015;In Use;Aula Meeting Room
+Zona;July 2026;Aver Cam 570 Camera for Conference;Camera;MMD202608070015;Repair;Aula Meeting Room
 Zona;July 2026;Yamaha VXL1-16 Speaker Slim Line Array;Audio - Speaker/Amplifier;MMD202608070016;In Use;Aula Meeting Room
-Zona;July 2026;Yamaha VXL1-16 Speaker Slim Line Array;Audio - Speaker/Amplifier;MMD202608070017;In Use;Aula Meeting Room
-Zona;July 2026;Yamaha XMV4280 Amplifier Main Speaker;Audio - Speaker/Amplifier;MMD202608070018;In Use;Aula Meeting Room
+Zona;July 2026;Yamaha VXL1-16 Speaker Slim Line Array;Audio - Speaker/Amplifier;MMD202608070017;Repair;Aula Meeting Room
+Zona;July 2026;Yamaha XMV4280 Amplifier Main Speaker;Audio - Speaker/Amplifier;MMD202608070018;Repair;Aula Meeting Room
 Zona;July 2026;Audinate Dante Analog To Network Adapter;Networking;MMD202608070019;In Use;Aula Meeting Room
-Zona;July 2026;Netgear GS308EPP PoE Switch 8 port;Networking;MMD202608070020;In Use;Aula Meeting Room
+Zona;July 2026;Netgear GS308EPP PoE Switch 8 port;Networking;MMD202608070020;Repair;Aula Meeting Room
 Zona;July 2026;Shure ULXD2/SM58 Wireless Handheld Mic (1);Microphone;MMD202608070021;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD2/SM58 Wireless Handheld Mic (2);Microphone;MMD202608070022;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD2/SM58 Wireless Handheld Mic (3);Microphone;MMD202608070023;In Use;Aula Meeting Room
-Zona;July 2026;Shure ULXD2/SM58 Wireless Handheld Mic (4);Microphone;MMD202608070024;In Use;Aula Meeting Room
+Zona;July 2026;Shure ULXD2/SM58 Wireless Handheld Mic (4);Microphone;MMD202608070024;Repair;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1);Microphone;MMD202608070025;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2);Microphone;MMD202608070026;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3);Microphone;MMD202608070027;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4);Microphone;MMD202608070028;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5);Microphone;MMD202608070029;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6);Microphone;MMD202608070030;In Use;Aula Meeting Room
-Zona;July 2026;Shure SBC850-E Dual Docking Charging Station;Accessory - Charging/Battery;MMD202608070031;In Use;Aula Meeting Room
+Zona;July 2026;Shure SBC850-E Dual Docking Charging Station;Accessory - Charging/Battery;MMD202608070031;Repair;Aula Meeting Room
 Zona;July 2026;Shure ULXD4QE Wireless Receiver Mic (1);Microphone;MMD202608070032;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD4QE Wireless Receiver Mic (2);Microphone;MMD202608070033;In Use;Aula Meeting Room
 Zona;July 2026;Shure ULXD4QE Wireless Receiver Mic (3);Microphone;MMD202608070034;In Use;Aula Meeting Room
@@ -48,7 +48,7 @@ Zona;July 2026;Netgear GS308EPP PoE Switch 8 port;Networking;MMD202608070046;Rep
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1);Microphone;MMD202608070047;Repair;General Manager Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2);Microphone;MMD202608070048;Repair;General Manager Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (3);Microphone;MMD202608070049;Repair;General Manager Meeting Room
-Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4);Microphone;MMD202608070050;Repair;General Manager Meeting Room
+Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4);Microphone;MMD202608070050;In Use;General Manager Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (5);Microphone;MMD202608070051;Repair;General Manager Meeting Room
 Zona;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (6);Microphone;MMD202608070052;Repair;General Manager Meeting Room
 Zona;July 2026;Shure SBC850-E Dual Docking Charging Station;Accessory - Charging/Battery;MMD202608070053;Repair;General Manager Meeting Room
@@ -130,7 +130,7 @@ Zona;July 2026;Shure ULXD4QE Wireless Receiver Mic (2);Microphone;MMD20260807012
 Zona;July 2026;Shure P300-IMX Conference Audio Controller;Audio Processor;MMD202608070129;Repair;Teuku Umar Meeting Room
 Zona;July 2026;Barco CX50 Wireless Presentation;Presentation Device;MMD202608070130;In Use;Teuku Umar Meeting Room
 Zona;July 2026;Crestron TSS-1070-B-S-LB KIT Display Booking;Display;MMD202608070131;Repair;Teuku Umar Meeting Room
-Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070132;In Use;Bullian 3 Meeting Room
+Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070132;Repair;Bullian 3 Meeting Room
 Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070133;In Use;Bullian 3 Meeting Room
 Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070134;In Use;Production Operation Meeting Room
 Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070135;In Use;Production Operation Meeting Room
@@ -139,7 +139,7 @@ Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608
 Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070138;In Use;Field Manager Meeting Room
 Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070139;In Use;Field Manager Meeting Room
 Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070140;In Use;RAM Meeting Room
-Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070141;In Use;RAM Meeting Room
+Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070141;Repair;RAM Meeting Room
 Field;July 2026;Display Interactive TV 65 Inch with bracket;Display;MMD202608070142;In Use; Supply Chain Management Meeting Room
 Field;July 2026;Maxhub WT13M Wireless Presentation;Presentation Device;MMD202608070143;In Use; Supply Chain Management Meeting Room
 Field;July 2026;Hisense 100Q6N Display TV with Bracket Standing;Display;MMD202608070144;In Use;Bullian 2 Meeting Room
@@ -150,7 +150,7 @@ Field;July 2026;Aver Cam 570 Camera for Conference;Camera;MMD202608070148;In Use
 Field;July 2026;Yamaha VXL1-16 Speaker Slim Line Array;Audio - Speaker/Amplifier;MMD202608070149;In Use;Bullian 2 Meeting Room
 Field;July 2026;Yamaha VXL1-16 Speaker Slim Line Array;Audio - Speaker/Amplifier;MMD202608070150;In Use;Bullian 2 Meeting Room
 Field;July 2026;Yamaha XMV4280 Amplifier Main Speaker;Audio - Speaker/Amplifier;MMD202608070151;In Use;Bullian 2 Meeting Room
-Field;July 2026;Audinate Dante Analog To Network Adapter;Networking;MMD202608070152;In Use;Bullian 2 Meeting Room
+Field;July 2026;Audinate Dante Analog To Network Adapter;Networking;MMD202608070152;Repair;Bullian 2 Meeting Room
 Field;July 2026;Netgear GS308EPP PoE Switch 8 port;Networking;MMD202608070153;In Use;Bullian 2 Meeting Room
 Field;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (1);Microphone;MMD202608070154;In Use;Bullian 2 Meeting Room
 Field;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (2);Microphone;MMD202608070155;In Use;Bullian 2 Meeting Room
@@ -219,5 +219,6 @@ Field;July 2026;Shure ULXD8 + MX410LPDF/C Tablestand Gooseneck (4);Microphone;MM
 Field;July 2026;Shure ULXD4QE Wireless Receiver Mic (1);Microphone;MMD202608070218;In Use;Gedung Serbaguna
 Field;July 2026;Shure ULXD4QE Wireless Receiver Mic (3);Microphone;MMD202608070220;In Use;Gedung Serbaguna
 Field;July 2026;Shure ULXD4QE Wireless Receiver Mic (4);Microphone;MMD202608070221;In Use;Gedung Serbaguna
-Field;July 2026;Barco CX50 Wireless Presentation;Presentation Device;MMD202608070222;In Use;Gedung Serbaguna
+Field;July 2026;Barco CX50 Wireless Presentation;Presentation Device;MMD202608070222;Repair;Gedung Serbaguna
 Field;July 2026;Shure SBC450-E Dual Docking Charging Station;Accessory - Charging/Battery;MMD202608070223;In Use;Gedung Serbaguna
+Field;August 2026;Display;Display;MM390276192;Repair; Supply Chain Management Meeting Room
