@@ -10,8 +10,10 @@
     <!-- Chart.js and DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter (Fallback) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fontshare: Satoshi (Primary) -->
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -20,10 +22,39 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Satoshi', 'Inter', 'sans-serif'] 
+                    },
                     colors: {
-                        lightBg: '#F9FAFC', lightSidebar: '#D3F0F8', lightAccent: '#3B82F6', lightUrgent: '#E4F9F2',
-                        darkBg: '#0F172A', darkCard: '#1E293B', darkAccent: '#38BDF8', darkUrgent: '#FB923C',
+                        // Light Mode
+                        lightBg: '#F8F9FB', // soft light gray
+                        lightSidebar: '#FFFFFF',
+                        lightCard: '#FFFFFF',
+                        lightAccent: '#2563EB', // professional blue
+                        lightAccentHover: '#1D4ED8',
+                        lightTextPrimary: '#0F172A',
+                        lightTextSecondary: '#64748B',
+                        // Dark Mode
+                        darkBg: '#090D16', // deep dark blue/gray
+                        darkSidebar: '#111827',
+                        darkCard: '#111827',
+                        darkAccent: '#38BDF8', // soft indigo/blue
+                        darkAccentHover: '#0EA5E9',
+                        darkTextPrimary: '#F8FAFC',
+                        darkTextSecondary: '#94A3B8',
+                        // Status
+                        statusInUseBg: '#DCFCE7',
+                        statusInUseText: '#166534',
+                        statusRepairBg: '#FEE2E2',
+                        statusRepairText: '#991B1B',
+                        darkStatusInUseBg: 'rgba(34, 197, 94, 0.2)',
+                        darkStatusInUseText: '#4ADE80',
+                        darkStatusRepairBg: 'rgba(239, 68, 68, 0.2)',
+                        darkStatusRepairText: '#F87171',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'soft-dark': '0 4px 20px -2px rgba(0, 0, 0, 0.2)',
                     }
                 }
             }
@@ -32,13 +63,13 @@
     </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Satoshi', 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -56,26 +87,68 @@
 
         .view-section {
             display: none;
+            animation: fadeIn 0.3s ease-out;
         }
 
         .view-section.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sidebar Nav Item Transitions */
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-item:hover {
+            transform: translateX(4px);
+        }
+
         .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.5);
-            color: #3B82F6;
+            background: linear-gradient(90deg, rgba(37, 99, 235, 0.1) 0%, transparent 100%);
+            color: #2563EB;
             font-weight: 600;
+            border-left: 3px solid #2563EB;
         }
 
         .dark .nav-item.active {
-            background-color: #1E293B;
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
             color: #38BDF8;
+            border-left: 3px solid #38BDF8;
         }
 
+        /* Modal Transitions */
         .modal-bg {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            animation: fadeInModal 0.2s ease-out;
+        }
+        
+        .modal-content {
+            animation: scaleInModal 0.2s ease-out;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleInModal {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Table sticky header blur */
+        .sticky-header {
+            backdrop-filter: blur(8px);
+            background-color: rgba(248, 249, 251, 0.9);
+        }
+        .dark .sticky-header {
+            background-color: rgba(17, 24, 39, 0.9);
         }
     </style>
 </head>
@@ -132,17 +205,14 @@
 
         <!-- Header -->
         <header
-            class="h-20 bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 z-10 flex-shrink-0">
+            class="h-20 bg-white/80 dark:bg-darkCard/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 z-10 flex-shrink-0 sticky top-0 transition-colors duration-300">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()"
                     class="md:hidden p-2 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800 dark:text-white leading-tight">Dashboard
-                        Inventaris Perangkat Multimedia</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide">Zona 1 dan Field
-                        Jambi</p>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-white leading-tight">Inventaris Multimedia</h1>
                 </div>
             </div>
 
@@ -210,6 +280,17 @@
 
             <!-- ================= VIEW: DASHBOARD ================= -->
             <div id="view-dashboard" class="view-section active space-y-6">
+                <!-- Welcome & Last Update -->
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Selamat Datang, {{ name }}</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                            <i class="fa-regular fa-clock"></i>
+                            <span id="last-update-text">Menunggu sinkronisasi data...</span>
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Filters -->
                 <div
                     class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -263,7 +344,7 @@
                 <!-- KPIs -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl p-5 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-lightAccent dark:text-darkAccent flex items-center justify-center text-xl">
                             <i class="fa-solid fa-desktop"></i>
@@ -274,7 +355,7 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl p-5 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-layer-group"></i>
@@ -285,7 +366,7 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl p-5 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-xl bg-pink-50 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-location-dot"></i>
@@ -296,7 +377,7 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl p-5 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-circle-check"></i>
@@ -307,7 +388,7 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl p-5 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-500 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -322,13 +403,13 @@
                 <!-- Charts 1 -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div
-                        class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark rounded-2xl p-5">
                         <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Jumlah Perangkat by Kategori
                         </h3>
                         <div class="relative h-64"><canvas id="chartCategory"></canvas></div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark rounded-2xl p-5 flex flex-col">
                         <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Jumlah Perangkat by Lokasi
                         </h3>
                         <div class="relative flex-1 overflow-y-auto">
@@ -341,19 +422,19 @@
                 <!-- Charts 2 (Shorter height) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark rounded-2xl p-5 flex flex-col">
                         <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Perangkat by Aset
                             (Area)</h3>
                         <div class="relative h-48 flex justify-center"><canvas id="chartAset"></canvas></div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark rounded-2xl p-5 flex flex-col">
                         <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Tren Perangkat by
                             Periode</h3>
                         <div class="relative h-48"><canvas id="chartPeriod"></canvas></div>
                     </div>
                     <div
-                        class="bg-white dark:bg-darkCard p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark rounded-2xl p-5 flex flex-col">
                         <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-3 text-sm">Persentase Kondisi
                         </h3>
                         <div class="relative h-48 flex justify-center"><canvas id="chartStatus"></canvas></div>
@@ -363,7 +444,7 @@
                 <!-- Bottom Section -->
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div
-                        class="xl:col-span-2 bg-white dark:bg-darkCard rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        class="xl:col-span-2 bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark overflow-hidden flex flex-col">
                         <div
                             class="p-5 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between">
                             <h3 class="font-semibold flex items-center gap-2"><i
@@ -389,7 +470,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-darkCard rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark flex flex-col">
                         <div class="p-5 border-b border-slate-200 bg-slate-50 dark:bg-slate-800/50">
                             <h3 class="font-semibold">Pengaduan Open Teratas</h3>
                         </div>
@@ -403,14 +484,91 @@
 
             <!-- ================= VIEW: PENGADUAN ================= -->
             <div id="view-pengaduan" class="view-section space-y-6">
-                <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">Sistem Manajemen Pengaduan</h2>
-                        <button onclick="openComplaintModal()"
-                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
-                            <i class="fa-solid fa-plus mr-1"></i> Buat Pengaduan
-                        </button>
+                <div class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6">
+                    <div class="flex flex-col gap-4 mb-5">
+
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+
+                            <h2 class="text-xl font-bold">
+                                Sistem Manajemen Pengaduan
+                            </h2>
+
+                            <button onclick="openComplaintModal()"
+                                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
+
+                                <i class="fa-solid fa-plus mr-1"></i>
+                                Buat Pengaduan
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- EXPORT LAPORAN PDF -->
+                        <div
+                            class="flex flex-col lg:flex-row lg:items-end gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+
+                            <div>
+                                <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    Laporan Pengaduan
+                                </p>
+
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Pilih periode laporan yang ingin diekspor.
+                                </p>
+                            </div>
+
+
+                            <div class="lg:ml-auto flex flex-col sm:flex-row gap-3">
+
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">
+
+                                        Tanggal Mulai
+
+                                    </label>
+                                    <form action="/export/pengaduan/pdf" method="GET"
+                                        class="lg:ml-auto flex flex-col sm:flex-row gap-3">
+
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-500 mb-1">
+                                                Tanggal Mulai
+                                            </label>
+
+                                            <input type="date" name="start" required
+                                                class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-500 mb-1">
+                                                Tanggal Akhir
+                                            </label>
+
+                                            <input type="date" name="end" required
+                                                class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+
+                                        <div class="flex items-end">
+                                            <button type="submit"
+                                                class="w-full sm:w-auto px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
+
+                                                <i class="fa-solid fa-file-pdf mr-2"></i>
+                                                Export PDF
+
+                                            </button>
+                                        </div>
+
+                                    </form>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
+
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
@@ -433,7 +591,7 @@
             <!-- ================= VIEW: DATA PERANGKAT ================= -->
             <div id="view-data" class="view-section space-y-6">
                 <div
-                    class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col h-[calc(100vh-140px)]">
+                    class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6 flex flex-col h-[calc(100vh-140px)]">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold">Data Lengkap Perangkat CSV</h2>
                         {% if role == 'admin' %}
@@ -469,7 +627,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Profile Card -->
                     <div
-                        class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center text-center">
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6 flex flex-col items-center text-center">
                         <img src="https://ui-avatars.com/api/?name={{ name }}&background=3B82F6&color=fff&size=96"
                             class="w-24 h-24 rounded-full border-4 border-blue-100 dark:border-slate-700 shadow mb-4"
                             alt="Avatar">
@@ -568,7 +726,7 @@
     <!-- CRUD Data Perangkat Modal (Admin Only) -->
     <div id="deviceModal" class="fixed inset-0 modal-bg z-[60] hidden flex items-center justify-center p-4">
         <div
-            class="bg-white dark:bg-darkCard w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+            class="bg-white/95 dark:bg-darkCard/95 backdrop-blur-lg w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-lg" id="deviceModalTitle">Tambah Perangkat Baru</h3>
                 <button onclick="closeDeviceModal()" class="text-slate-400 hover:text-slate-600"><i
@@ -620,7 +778,7 @@
     <!-- Create Complaint Modal -->
     <div id="complaintModal" class="fixed inset-0 modal-bg z-[60] hidden flex items-center justify-center p-4">
         <div
-            class="bg-white dark:bg-darkCard w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+            class="bg-white/95 dark:bg-darkCard/95 backdrop-blur-lg w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-lg">Buat Pengaduan</h3>
                 <button onclick="closeComplaintModal()" class="text-slate-400 hover:text-slate-600"><i
@@ -846,6 +1004,13 @@
 
                 fullData = data;
 
+                // Update "Last Update" text
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                const formattedTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const lastUpdateEl = document.getElementById('last-update-text');
+                if (lastUpdateEl) lastUpdateEl.textContent = `${formattedDate} • ${formattedTime} WIB`;
+
                 // Update notification badge
                 const unread = complaintsData.unread_count || 0;
                 const dot = document.getElementById('notif-dot');
@@ -987,6 +1152,47 @@
 
         // --- Complaint Logic ---
         function openComplaintModal() {
+            function exportComplaintPDF() {
+
+                const startDate = document.getElementById(
+                    'report-start-date'
+                ).value;
+
+                const endDate = document.getElementById(
+                    'report-end-date'
+                ).value;
+
+
+                if (!startDate || !endDate) {
+
+                    alert(
+                        'Silakan pilih tanggal mulai dan tanggal akhir terlebih dahulu.'
+                    );
+
+                    return;
+                }
+
+
+                if (endDate < startDate) {
+
+                    alert(
+                        'Tanggal akhir tidak boleh lebih kecil dari tanggal mulai.'
+                    );
+
+                    return;
+                }
+
+
+                const url =
+                    '/export/pengaduan/pdf'
+                    + '?start='
+                    + encodeURIComponent(startDate)
+                    + '&end='
+                    + encodeURIComponent(endDate);
+
+
+                window.location.href = url;
+            }
             // Populate device dropdown
             if (fullData && fullData.device_list) {
                 const sel = document.getElementById('comp-device-select');

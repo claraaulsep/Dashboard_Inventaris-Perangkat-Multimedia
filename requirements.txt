@@ -4,3 +4,4 @@ requests
 gunicorn
 supabase
 python-dotenv
+reportlab

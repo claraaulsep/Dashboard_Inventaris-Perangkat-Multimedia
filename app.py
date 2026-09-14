@@ -3,14 +3,37 @@
 from whatsapp_bot import save_pending_state
 from whatsapp_bot import get_pending_state
 from whatsapp_bot import delete_pending_state
-from pydantic import functional_validators
-from pydantic import functional_validators
 from pandas.io.formats import style_render
 from whatsapp_bot import detect_urgent
 import os
+import io
 import pandas as pd
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
-from datetime import datetime
+
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    request,
+    session,
+    redirect,
+    url_for,
+    send_file
+)
+
+from datetime import datetime, timedelta, timezone
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.units import cm
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer
+)
 from database import supabase
 from whatsapp_bot import parse_complaint_message, send_whatsapp_reply, build_confirmation_message, find_device_candidates 
 
@@ -662,7 +685,542 @@ def manage_complaints():
                 "success": False,
                 "message": str(e)
             }), 500
+# ==========================================
+# EXPORT PDF LAPORAN PENGADUAN
+# ==========================================
+@app.route('/export/pengaduan/pdf')
+def export_pengaduan_pdf():
 
+    if 'user' not in session:
+        return redirect('/login')
+
+    tanggal_mulai = request.args.get('start')
+    tanggal_akhir = request.args.get('end')
+
+    if not tanggal_mulai or not tanggal_akhir:
+        return jsonify({
+            "error": "Tanggal mulai dan tanggal akhir wajib diisi"
+        }), 400
+
+    try:
+        start_date = datetime.strptime(
+            tanggal_mulai,
+            "%Y-%m-%d"
+        )
+
+        end_date = datetime.strptime(
+            tanggal_akhir,
+            "%Y-%m-%d"
+        )
+
+        if end_date < start_date:
+            return jsonify({
+                "error": "Tanggal akhir tidak boleh lebih kecil dari tanggal mulai"
+            }), 400
+
+        # ==========================================
+        # BATAS PERIODE WIB
+        # ==========================================
+        start_iso = (
+            start_date.strftime("%Y-%m-%d")
+            + "T00:00:00+07:00"
+        )
+
+        next_day = end_date + timedelta(days=1)
+
+        end_iso = (
+            next_day.strftime("%Y-%m-%d")
+            + "T00:00:00+07:00"
+        )
+
+        # ==========================================
+        # AMBIL PENGADUAN DARI SUPABASE
+        # ==========================================
+        response = (
+            supabase
+            .table("pengaduan")
+            .select("*")
+            .gte("created_at", start_iso)
+            .lt("created_at", end_iso)
+            .order("created_at")
+            .execute()
+        )
+
+        complaints = response.data or []
+
+        # ==========================================
+        # HITUNG RINGKASAN
+        # ==========================================
+        total_pengaduan = len(complaints)
+
+        total_open = len([
+            item for item in complaints
+            if str(item.get("status", "")).strip().lower()
+            == "open"
+        ])
+
+        total_resolved = len([
+            item for item in complaints
+            if str(item.get("status", "")).strip().lower()
+            == "resolved"
+        ])
+
+        # ==========================================
+        # BUAT FILE PDF DI MEMORY
+        # ==========================================
+        buffer = io.BytesIO()
+
+        document = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A4),
+            rightMargin=1.2 * cm,
+            leftMargin=1.2 * cm,
+            topMargin=1.2 * cm,
+            bottomMargin=1.2 * cm
+        )
+
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle(
+            "ReportTitle",
+            parent=styles["Title"],
+            alignment=TA_CENTER,
+            fontSize=15,
+            leading=18,
+            spaceAfter=4
+        )
+
+        subtitle_style = ParagraphStyle(
+            "ReportSubtitle",
+            parent=styles["Normal"],
+            alignment=TA_CENTER,
+            fontSize=9,
+            leading=12
+        )
+
+        cell_style = ParagraphStyle(
+            "CellStyle",
+            parent=styles["Normal"],
+            fontSize=7,
+            leading=9
+        )
+
+        header_style = ParagraphStyle(
+            "HeaderStyle",
+            parent=cell_style,
+            textColor=colors.white,
+            alignment=TA_CENTER
+        )
+
+        elements = []
+
+        # ==========================================
+        # JUDUL
+        # ==========================================
+        elements.append(
+            Paragraph(
+                "PT PERTAMINA HULU ROKAN",
+                title_style
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                "ZONA 1 JAMBI",
+                subtitle_style
+            )
+        )
+
+        elements.append(Spacer(1, 0.2 * cm))
+
+        elements.append(
+            Paragraph(
+                "LAPORAN PENGADUAN PERANGKAT MULTIMEDIA",
+                title_style
+            )
+        )
+
+        # ==========================================
+        # FORMAT PERIODE
+        # ==========================================
+        bulan_indonesia = {
+            1: "Januari",
+            2: "Februari",
+            3: "Maret",
+            4: "April",
+            5: "Mei",
+            6: "Juni",
+            7: "Juli",
+            8: "Agustus",
+            9: "September",
+            10: "Oktober",
+            11: "November",
+            12: "Desember"
+        }
+
+        periode_mulai = (
+            f"{start_date.day} "
+            f"{bulan_indonesia[start_date.month]} "
+            f"{start_date.year}"
+        )
+
+        periode_akhir = (
+            f"{end_date.day} "
+            f"{bulan_indonesia[end_date.month]} "
+            f"{end_date.year}"
+        )
+
+        elements.append(
+            Paragraph(
+                f"Periode: {periode_mulai} s.d. {periode_akhir}",
+                subtitle_style
+            )
+        )
+
+        elements.append(Spacer(1, 0.4 * cm))
+
+        # ==========================================
+        # RINGKASAN
+        # ==========================================
+        summary_data = [
+            [
+                Paragraph("<b>Total Pengaduan</b>", cell_style),
+                Paragraph("<b>Open</b>", cell_style),
+                Paragraph("<b>Resolved</b>", cell_style)
+            ],
+            [
+                str(total_pengaduan),
+                str(total_open),
+                str(total_resolved)
+            ]
+        ]
+
+        summary_table = Table(
+            summary_data,
+            colWidths=[5 * cm, 5 * cm, 5 * cm]
+        )
+
+        summary_table.setStyle(TableStyle([
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#E2E8F0")
+            ),
+            (
+                "ALIGN",
+                (0, 0),
+                (-1, -1),
+                "CENTER"
+            ),
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.HexColor("#94A3B8")
+            ),
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                6
+            ),
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                6
+            )
+        ]))
+
+        elements.append(summary_table)
+        elements.append(Spacer(1, 0.5 * cm))
+
+        # ==========================================
+        # HEADER TABEL
+        # ==========================================
+        table_data = [[
+            Paragraph("<b>No</b>", header_style),
+            Paragraph("<b>Tanggal</b>", header_style),
+            Paragraph("<b>Perangkat</b>", header_style),
+            Paragraph("<b>Serial Number</b>", header_style),
+            Paragraph("<b>Lokasi</b>", header_style),
+            Paragraph("<b>Pengaduan</b>", header_style),
+            Paragraph("<b>Status</b>", header_style)
+        ]]
+
+        # ==========================================
+        # ISI TABEL
+        # ==========================================
+        for index, complaint in enumerate(
+            complaints,
+            start=1
+        ):
+            created_at = complaint.get("created_at")
+
+            tanggal = "-"
+
+            if created_at:
+                try:
+                    dt = datetime.fromisoformat(
+                        str(created_at).replace(
+                            "Z",
+                            "+00:00"
+                        )
+                    )
+
+                    if dt.tzinfo is not None:
+                        dt = dt.astimezone(
+                            timezone(
+                                timedelta(hours=7)
+                            )
+                        )
+
+                    tanggal = dt.strftime(
+                        "%d/%m/%Y"
+                    )
+
+                except Exception:
+                    tanggal = str(created_at)[:10]
+
+            table_data.append([
+                Paragraph(str(index), cell_style),
+
+                Paragraph(
+                    tanggal,
+                    cell_style
+                ),
+
+                Paragraph(
+                    str(
+                        complaint.get(
+                            "device_name",
+                            "-"
+                        ) or "-"
+                    ),
+                    cell_style
+                ),
+
+                Paragraph(
+                    str(
+                        complaint.get(
+                            "serial",
+                            "-"
+                        ) or "-"
+                    ),
+                    cell_style
+                ),
+
+                Paragraph(
+                    str(
+                        complaint.get(
+                            "location",
+                            "-"
+                        ) or "-"
+                    ),
+                    cell_style
+                ),
+
+                Paragraph(
+                    str(
+                        complaint.get(
+                            "title",
+                            "-"
+                        ) or "-"
+                    ),
+                    cell_style
+                ),
+
+                Paragraph(
+                    str(
+                        complaint.get(
+                            "status",
+                            "-"
+                        ) or "-"
+                    ),
+                    cell_style
+                )
+            ])
+
+        # ==========================================
+        # JIKA DATA KOSONG
+        # ==========================================
+        if not complaints:
+            table_data.append([
+                "",
+                "",
+                "",
+                Paragraph(
+                    "Tidak ada pengaduan pada periode ini.",
+                    cell_style
+                ),
+                "",
+                "",
+                ""
+            ])
+
+        complaint_table = Table(
+            table_data,
+            repeatRows=1,
+            colWidths=[
+                1 * cm,
+                2.2 * cm,
+                4.5 * cm,
+                3.5 * cm,
+                4.2 * cm,
+                8 * cm,
+                2.2 * cm
+            ]
+        )
+
+        complaint_table.setStyle(TableStyle([
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#1E3A8A")
+            ),
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                colors.white
+            ),
+            (
+                "ALIGN",
+                (0, 0),
+                (0, -1),
+                "CENTER"
+            ),
+            (
+                "ALIGN",
+                (1, 0),
+                (1, -1),
+                "CENTER"
+            ),
+            (
+                "ALIGN",
+                (-1, 0),
+                (-1, -1),
+                "CENTER"
+            ),
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "TOP"
+            ),
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.35,
+                colors.HexColor("#CBD5E1")
+            ),
+            (
+                "ROWBACKGROUNDS",
+                (0, 1),
+                (-1, -1),
+                [
+                    colors.white,
+                    colors.HexColor("#F8FAFC")
+                ]
+            ),
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            )
+        ]))
+
+        elements.append(complaint_table)
+        elements.append(Spacer(1, 0.4 * cm))
+
+        # ==========================================
+        # TANGGAL CETAK
+        # ==========================================
+        sekarang_wib = datetime.now(
+            timezone(
+                timedelta(hours=7)
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                "Dicetak pada: "
+                + sekarang_wib.strftime(
+                    "%d/%m/%Y %H:%M WIB"
+                ),
+                styles["Normal"]
+            )
+        )
+
+        document.build(elements)
+
+        buffer.seek(0)
+
+        filename = (
+            f"laporan_pengaduan_"
+            f"{tanggal_mulai}_sd_{tanggal_akhir}.pdf"
+        )
+
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=filename,
+            mimetype="application/pdf"
+        )
+
+    except Exception as e:
+        print(
+            "Gagal export PDF pengaduan:",
+            e,
+            flush=True
+        )
+
+        return jsonify({
+            "error": str(e)
+        }), 500
+def get_authorized_whatsapp_user(sender):
+    try:
+        sender = str(sender).strip()
+
+        response = (
+            supabase
+            .table("whatsapp_users")
+            .select("id,nama,nomor_wa,bagian,is_active")
+            .eq("nomor_wa", sender)
+            .eq("is_active", True)
+            .limit(1)
+            .execute()
+        )
+
+        if response.data:
+            return response.data[0]
+
+        return None
+
+    except Exception as e:
+        print(
+            f"Error cek whitelist WhatsApp: {e}",
+            flush=True
+        )
+        return None
+        
 # --- WhatsApp Bot: Lapor Kendala via WhatsApp ---
 @app.route('/webhook/whatsapp', methods=['POST'])
 def whatsapp_webhook():
@@ -707,13 +1265,46 @@ def whatsapp_webhook():
         or payload.get('text')
         or ''
     )
-
     print("SENDER:", sender, flush=True)
     print("MESSAGE:", message, flush=True)
 
+
     if not sender or not str(message).strip():
         return jsonify({'status': 'ignored'}), 200
+
+
+    # ==========================================
+    # CEK AKSES NOMOR WHATSAPP
+    # ==========================================
+    authorized_user = get_authorized_whatsapp_user(sender)
+
+    if not authorized_user:
+        print(
+            f"AKSES WHATSAPP DITOLAK: {sender}",
+            flush=True
+        )
+
+        send_whatsapp_reply(
+            sender,
+            "❌ Akses ditolak.\n\n"
+            "Nomor WhatsApp Anda tidak terdaftar sebagai "
+            "pengguna layanan pengaduan perangkat multimedia."
+        )
+
+        return jsonify({
+            "status": "unauthorized"
+        }), 200
+
+
+    print(
+        "WHATSAPP USER TERDAFTAR:",
+        authorized_user.get("nama"),
+        flush=True
+    )
+
+
     pending_row = get_pending_state(sender)
+   
 
     print("ISI PENDING SUPABASE:", pending_row, flush=True)
 
