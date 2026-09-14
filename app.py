@@ -83,7 +83,7 @@ def is_bot_enabled():
 # --- Users Data ---
 USERS = {
     'admin': {'password': '123', 'role': 'admin', 'name': 'Admin'},
-    'tamu': {'password': '123', 'role': 'tamu', 'name': 'Tamu / Pekerja'}
+    'Manager': {'password': '123', 'role': 'Manager', 'name': 'Manager'}
 }
 
 # --- Helpers ---

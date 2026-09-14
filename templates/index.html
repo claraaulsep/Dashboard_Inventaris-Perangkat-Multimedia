@@ -22,8 +22,8 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { 
-                        sans: ['Satoshi', 'Inter', 'sans-serif'] 
+                    fontFamily: {
+                        sans: ['Satoshi', 'Inter', 'sans-serif']
                     },
                     colors: {
                         // Light Mode
@@ -95,15 +95,22 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Sidebar Nav Item Transitions */
         .nav-item {
             transition: all 0.2s ease-in-out;
         }
-        
+
         .nav-item:hover {
             transform: translateX(4px);
         }
@@ -127,19 +134,31 @@
             backdrop-filter: blur(4px);
             animation: fadeInModal 0.2s ease-out;
         }
-        
+
         .modal-content {
             animation: scaleInModal 0.2s ease-out;
         }
 
         @keyframes fadeInModal {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes scaleInModal {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         /* Table sticky header blur */
@@ -147,6 +166,7 @@
             backdrop-filter: blur(8px);
             background-color: rgba(248, 249, 251, 0.9);
         }
+
         .dark .sticky-header {
             background-color: rgba(17, 24, 39, 0.9);
         }
@@ -212,7 +232,8 @@
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800 dark:text-white leading-tight">Inventaris Multimedia</h1>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-white leading-tight">Inventaris Multimedia
+                    </h1>
                 </div>
             </div>
 
@@ -470,7 +491,8 @@
                             </table>
                         </div>
                     </div>
-                    <div class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark flex flex-col">
+                    <div
+                        class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark flex flex-col">
                         <div class="p-5 border-b border-slate-200 bg-slate-50 dark:bg-slate-800/50">
                             <h3 class="font-semibold">Pengaduan Open Teratas</h3>
                         </div>
@@ -484,7 +506,8 @@
 
             <!-- ================= VIEW: PENGADUAN ================= -->
             <div id="view-pengaduan" class="view-section space-y-6">
-                <div class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6">
+                <div
+                    class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6">
                     <div class="flex flex-col gap-4 mb-5">
 
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -593,7 +616,7 @@
                 <div
                     class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl shadow-soft dark:shadow-soft-dark border border-slate-100 dark:border-slate-700/50 p-6 flex flex-col h-[calc(100vh-140px)]">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">Data Lengkap Perangkat CSV</h2>
+                        <h2 class="text-xl font-bold">Data Lengkap Perangkat Multimedia</h2>
                         {% if role == 'admin' %}
                         <button onclick="openDeviceModal()"
                             class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
