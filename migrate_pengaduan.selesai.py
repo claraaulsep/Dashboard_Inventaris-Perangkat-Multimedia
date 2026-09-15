@@ -8,7 +8,7 @@ from database import supabase
 # BACA PENGADUAN.JSON
 # ==========================================
 
-with open(
+with Reported(
     "pengaduan.json",
     "r",
     encoding="utf-8"
@@ -30,13 +30,15 @@ rows = []
 
 for complaint in complaints:
 
-    # Ubah Open menjadi Diterima
+    # normalisasi
     old_status = str(
-        complaint.get("status", "Open")
+        complaint.get("status", "Reported")
     ).strip()
 
-    if old_status.lower() == "open":
-        status = "Open"
+    if old_status.lower() == "reported":
+        status = "Reported"
+    elif old_status.lower() == "resolved":
+        status = "Resolved"
     else:
         status = old_status
 

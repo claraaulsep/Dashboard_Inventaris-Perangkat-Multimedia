@@ -250,7 +250,8 @@
 
                 <!-- Notif -->
                 <div class="relative">
-                    <button onclick="openNotifications()"
+                    <button onclick="
+                        Notifications()"
                         class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
                         <i class="fa-regular fa-bell text-xl"></i>
                         <span id="notif-dot"
@@ -494,7 +495,7 @@
                     <div
                         class="bg-white/90 dark:bg-darkCard/90 backdrop-blur rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-soft dark:shadow-soft-dark flex flex-col">
                         <div class="p-5 border-b border-slate-200 bg-slate-50 dark:bg-slate-800/50">
-                            <h3 class="font-semibold">Pengaduan Open Teratas</h3>
+                            <h3 class="font-semibold">Pengaduan Reported Teratas</h3>
                         </div>
                         <div class="p-5 flex-1 space-y-3 overflow-y-auto max-h-96" id="dashboard-complaints"></div>
                         <div class="p-3 border-t border-slate-200"><button onclick="switchView('pengaduan')"
@@ -516,7 +517,7 @@
                                 Sistem Manajemen Pengaduan
                             </h2>
 
-                            <button onclick="openComplaintModal()"
+                            <button onclick="ReportedComplaintModal()"
                                 class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
 
                                 <i class="fa-solid fa-plus mr-1"></i>
@@ -618,7 +619,7 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold">Data Lengkap Perangkat Multimedia</h2>
                         {% if role == 'admin' %}
-                        <button onclick="openDeviceModal()"
+                        <button onclick="ReportedDeviceModal()"
                             class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
                             <i class="fa-solid fa-plus mr-1"></i> Tambah Perangkat
                         </button>
@@ -983,7 +984,7 @@
         }
 
         function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
-        async function openNotifications() {
+        async function ReportedNotifications() {
             const dot = document.getElementById('notif-dot');
             const badge = document.getElementById('notif-badge');
             dot.classList.add('hidden');
@@ -1073,7 +1074,7 @@
             } catch (err) { console.error(err); }
         }
 
-        function renderDashboard(data, openComplaints) {
+        function renderDashboard(data, ReportedComplaints) {
             if (!optionsPopulated && data.filter_options) {
                 const populate = (id, arr) => {
                     const sel = document.getElementById(id); const val = sel.value;
@@ -1109,8 +1110,8 @@
             } else tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">Kondisi Aman.</td></tr>`;
 
             const widgetC = document.getElementById('dashboard-complaints'); widgetC.innerHTML = '';
-            if (openComplaints.length > 0) {
-                openComplaints.slice(0, 3).forEach(c => {
+            if (ReportedComplaints.length > 0) {
+                ReportedComplaints.slice(0, 3).forEach(c => {
                     widgetC.innerHTML += `
                     <div class="flex gap-4 items-start p-3 rounded-lg ${c.urgent ? 'bg-lightUrgent dark:bg-darkUrgent/20 border border-orange-200' : 'hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent'}">
                         <div class="w-2 h-2 mt-2 rounded-full ${c.urgent ? 'bg-orange-500' : 'bg-slate-300 dark:bg-slate-600'} flex-shrink-0"></div>
@@ -1131,14 +1132,86 @@
                 tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800"><td class="px-4 py-3">${d.Aset}</td><td class="px-4 py-3">${d.Period}</td><td class="px-4 py-3 font-medium">${d['Device Model']}</td><td class="px-4 py-3">${d.Category}</td><td class="px-4 py-3 font-mono text-xs">${d['Serial Number']}</td><td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">${d.Status}</span></td><td class="px-4 py-3">${d.Location}</td>${actions}</tr>`;
             });
         }
-
         function renderPengaduanView(complaints) {
-            const tb = document.getElementById('complaints-tbody'); tb.innerHTML = '';
+            const tb = document.getElementById('complaints-tbody');
+            tb.innerHTML = '';
+
+            const currentRole = String(userRole || '').trim().toLowerCase();
+
             complaints.forEach(c => {
-                let badge = c.status === 'Open' ? '<span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold">OPEN</span>' : '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">RESOLVED</span>';
+                const status = String(c.status || '').trim().toLowerCase();
+
+                // Open = data lama, Reported = status baru
+                const isActiveComplaint =
+                    status === 'open' || status === 'reported';
+
+                let badge = `
+                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-bold">
+                        ${c.status || '-'}
+                    </span>
+                `;
+
+                // Pengaduan aktif
+                if (isActiveComplaint) {
+                    badge = `
+                        <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold">
+                            REPORTED
+                        </span>
+                    `;
+                }
+
+                // Pengaduan selesai
+                if (status === 'resolved') {
+                    badge = `
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">
+                            RESOLVED
+                        </span>
+                    `;
+                }
+
                 let actions = '-';
-                if (c.status === 'Open' && userRole === 'admin') actions = `<button onclick="resolveComplaint(${c.id})" class="px-3 py-1 bg-emerald-500 text-white rounded hover:bg-emerald-600 text-xs font-bold">Selesaikan</button>`;
-                tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800"><td class="px-4 py-3">#${c.id}</td><td class="px-4 py-3 font-medium">${c.title} ${c.urgent ? '<i class="fa-solid fa-fire text-orange-500 ml-1"></i>' : ''}</td><td class="px-4 py-3">${c.location}</td><td class="px-4 py-3 font-mono text-xs">${c.serial || '-'}</td><td class="px-4 py-3">${badge}</td><td class="px-4 py-3 text-right">${actions}</td></tr>`;
+
+                // HANYA ADMIN dapat menyelesaikan pengaduan aktif
+                if (currentRole === 'admin' && isActiveComplaint) {
+                    actions = `
+                        <button
+                            type="button"
+                            onclick="resolveComplaint(${c.id})"
+                            class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer">
+                            <i class="fa-solid fa-check mr-1"></i>
+                            Selesaikan
+                        </button>
+                    `;
+                }
+
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                        <td class="px-4 py-3">#${c.id}</td>
+
+                        <td class="px-4 py-3 font-medium">
+                            ${c.title || '-'}
+                            ${c.urgent
+                        ? '<i class="fa-solid fa-fire text-orange-500 ml-1"></i>'
+                        : ''}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            ${c.location || '-'}
+                        </td>
+
+                        <td class="px-4 py-3 font-mono text-xs">
+                            ${c.serial || '-'}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            ${badge}
+                        </td>
+
+                        <td class="px-4 py-3 text-right">
+                            ${actions}
+                        </td>
+                    </tr>
+                `;
             });
         }
 
@@ -1174,7 +1247,7 @@
         function resetFilters() { ['kategori', 'lokasi', 'status', 'aset', 'periode'].forEach(f => document.getElementById('filter-' + f).value = ""); fetchAllData(); }
 
         // --- Complaint Logic ---
-        function openComplaintModal() {
+        function ReportedComplaintModal() {
             function exportComplaintPDF() {
 
                 const startDate = document.getElementById(
@@ -1313,14 +1386,14 @@
                     const el = document.createElement('div');
                     el.className = 'p-3 border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer';
                     el.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-bold text-sm">${i['Device Model']}</p><p class="text-xs text-slate-500 font-mono">${i['Serial Number']}</p></div><span class="text-xs font-bold ${stClr} uppercase">${i.Status}</span></div>`;
-                    el.onclick = () => openSearchModal(i);
+                    el.onclick = () => ReportedSearchModal(i);
                     resDiv.appendChild(el);
                 });
             }
             resDiv.classList.remove('hidden');
         }
 
-        function openSearchModal(device) {
+        function ReportedSearchModal(device) {
             const modal = document.getElementById('searchModal');
             document.getElementById('sm-model').textContent = device['Device Model'] || '-';
             document.getElementById('sm-sn').textContent = 'S/N: ' + (device['Serial Number'] || '-');
@@ -1344,7 +1417,7 @@
         }
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) document.getElementById('searchResults').classList.add('hidden');
-            if (!e.target.closest('#notifDropdown') && !e.target.closest('[onclick="openNotifications()"]')) document.getElementById('notifDropdown').classList.add('hidden');
+            if (!e.target.closest('#notifDropdown') && !e.target.closest('[onclick="ReportedNotifications()"]')) document.getElementById('notifDropdown').classList.add('hidden');
             if (!e.target.closest('#userMenu') && !e.target.closest('[onclick="toggleUserMenu()"]')) document.getElementById('userMenu').classList.add('hidden');
         });
 
@@ -1364,7 +1437,7 @@
             document.getElementById('dev-status').innerHTML = buildOptions(fullData.filter_options.status);
         }
 
-        function openDeviceModal() {
+        function ReportedDeviceModal() {
             document.getElementById('dev-mode').value = 'add';
             document.getElementById('deviceModalTitle').textContent = "Tambah Perangkat Baru";
             document.getElementById('deviceForm').reset();

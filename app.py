@@ -371,15 +371,15 @@ def manage_complaints():
 
             complaints = response.data or []
 
-            # Pengaduan aktif sekarang menggunakan status open
-            open_c = [
+            # Pengaduan aktif sekarang menggunakan status Reported
+            reported_c = [
                 c for c in complaints
                 if str(c.get("status", "")).strip().lower()
-                == "open"
+                == "reported"
             ]
 
             # Urgent ditampilkan lebih dahulu
-            open_c.sort(
+            reported_c.sort(
                 key=lambda x: x.get("urgent", False),
                 reverse=True
             )
@@ -402,7 +402,7 @@ def manage_complaints():
             
 
             return jsonify({
-                "complaints": open_c,
+                "complaints": reported_c,
                 "all": complaints,
                 "unread_count": unread_count,
                 "notif_items": notif_items
@@ -459,7 +459,7 @@ def manage_complaints():
                     data.get("urgent", False)
                 ),
 
-                "status": "Open",
+                "status": "Reported",
 
                 "asset": data.get(
                     "asset"
@@ -631,40 +631,40 @@ def manage_complaints():
                 .eq("id", c_id)
                 .execute()
             )
-
             # ==========================================
             # UPDATE INVENTARIS -> IN USE
-            # MASIH CSV SEMENTARA
+            # LANGSUNG KE SUPABASE
             # ==========================================
             serial = str(
                 complaint.get("serial", "")
             ).strip()
-        
 
-            if serial:
-                df = load_data()
+            if serial and serial.lower() not in ["-", "none", "nan"]:
 
-                idx = df.index[
-                    df["Serial Number"]
-                    .astype(str)
-                    .str.strip()
-                    .str.lower()
-                    == serial.lower()
-                ].tolist()
+                inventory_response = (
+                    supabase
+                    .table("inventaris")
+                    .update({
+                        "status": "In Use"
+                    })
+                    .eq("serial_number", serial)
+                    .execute()
+                )
 
-                if idx:
-                    df.at[idx[0], "Status"] = "In Use"
-                    save_data(df)
-
-                    print(
-                         f"Inventory {serial} berhasil diubah ke In Use",
+                print(
+                    "UPDATE INVENTARIS IN USE:",
+                    serial,
+                    inventory_response.data,
                     flush=True
-                    )
-                else:
+                )
+
+                if not inventory_response.data:
                     print(
-                         f"Serial {serial} tidak ditemukan di inventory",
+                        f"PERINGATAN: serial {serial} tidak ditemukan "
+                        f"di tabel inventaris",
                         flush=True
                     )
+            
             return jsonify({
                 "success": True,
                 "complaint": (
@@ -753,10 +753,10 @@ def export_pengaduan_pdf():
         # ==========================================
         total_pengaduan = len(complaints)
 
-        total_open = len([
+        total_Reported = len([
             item for item in complaints
             if str(item.get("status", "")).strip().lower()
-            == "open"
+            in ["reported", "open"]
         ])
 
         total_resolved = len([
@@ -885,12 +885,12 @@ def export_pengaduan_pdf():
         summary_data = [
             [
                 Paragraph("<b>Total Pengaduan</b>", cell_style),
-                Paragraph("<b>Open</b>", cell_style),
+                Paragraph("<b>Reported</b>", cell_style),
                 Paragraph("<b>Resolved</b>", cell_style)
             ],
             [
                 str(total_pengaduan),
-                str(total_open),
+                str(total_Reported),
                 str(total_resolved)
             ]
         ]
@@ -1252,7 +1252,7 @@ def whatsapp_webhook():
         else (request.get_json(silent=True) or {})
     )
 
-    print("[whatsapp webhook] payload open:", payload, flush=True)
+    print("[whatsapp webhook] payload Reported:", payload, flush=True)
 
     sender = (
         payload.get('sender')
@@ -1430,14 +1430,14 @@ def whatsapp_webhook():
                     }), 200
 
                 # ==========================================
-                # CEK TIKET OPEN UNTUK SERIAL YANG SAMA
+                # CEK TIKET Reported UNTUK SERIAL YANG SAMA
                 # ==========================================
                 active_response = (
                     supabase
                     .table("pengaduan")
                     .select("*")
                     .eq("serial", serial)
-                    .eq("status", "Open")
+                    .eq("status", "Reported")
                     .order("id", desc=True)
                     .limit(1)
                     .execute()
@@ -1484,7 +1484,7 @@ def whatsapp_webhook():
                 # TOLAK JIKA MASIH DALAM PENANGANAN
                 # ==========================================
                 # Tiket lama yang sudah Resolved tidak menghalangi tiket baru.
-                # Pengaduan ditolak hanya jika ada tiket Open atau status
+                # Pengaduan ditolak hanya jika ada tiket Reported atau status
                 # inventaris perangkat saat ini adalah Repair.
                 if active_complaint or device_in_repair:
                     delete_pending_state(sender)
@@ -1535,7 +1535,7 @@ def whatsapp_webhook():
                     ),
                     "location": device_location,
                     "urgent": urgent,
-                    "status": "Open",
+                    "status": "Reported",
                     "asset": device.get("Aset", "-"),
                     "category": device.get("Category", "-"),
                     "serial": serial,
@@ -1579,7 +1579,7 @@ def whatsapp_webhook():
                         .execute()
                     )
                 except Exception as inventory_error:
-                    # Rollback tiket agar tidak tercipta tiket Open dengan
+                    # Rollback tiket agar tidak tercipta tiket Reported dengan
                     # inventory yang gagal berubah menjadi Repair.
                     created_id = insert_response.data[0].get("id")
                     if created_id:
@@ -1659,7 +1659,7 @@ def whatsapp_webhook():
                     f"Perangkat: {new_complaint['device_name']}\n"
                     f"Lokasi: {new_complaint['location']}\n"
                     f"Serial Number: {new_complaint['serial']}\n"
-                    f"Status: Open"
+                    f"Status: Reported"
                 )
 
                 send_whatsapp_reply(
