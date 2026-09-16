@@ -330,25 +330,55 @@ def manage_devices():
         df = pd.concat([df, new_row], ignore_index=True)
         save_data(df)
         return jsonify({"success": True})
-        
+    
     elif request.method == 'PUT':
-        # Update based on Serial Number (assuming it's unique)
-        serial = data.get('Serial Number')
-        if not serial: return jsonify({"success": False, "message": "Serial Number required"}), 400
-        idx = df.index[df['Serial Number'] == serial].tolist()
-        if not idx: return jsonify({"success": False, "message": "Device not found"}), 404
-        for k, v in data.items():
-            if k in df.columns:
-                df.at[idx[0], k] = v
-        save_data(df)
-        return jsonify({"success": True})
-        
-    elif request.method == 'DELETE':
-        # Delete based on Serial Number
-        serial = data.get('Serial Number')
-        df = df[df['Serial Number'] != serial]
-        save_data(df)
-        return jsonify({"success": True})
+                serial = str(data.get('Serial Number', '')).strip()
+
+                if not serial:
+                    return jsonify({
+                        "success": False,
+                        "message": "Serial Number required"
+                    }), 400
+
+                update_data = {
+                    "aset": data.get("Aset"),
+                    "period": data.get("Period"),
+                    "device_model": data.get("Device Model"),
+                    "category": data.get("Category"),
+                    "status": data.get("Status"),
+                    "location": data.get("Location")
+                }
+
+                try:
+                    response = (
+                        supabase
+                        .table("inventaris")
+                        .update(update_data)
+                        .eq("serial_number", serial)
+                        .execute()
+                    )
+
+                    print("UPDATE DEVICE:", serial, response.data, flush=True)
+
+                    if not response.data:
+                        return jsonify({
+                            "success": False,
+                            "message": "Perangkat tidak ditemukan / tidak terupdate"
+                        }), 404
+
+                    return jsonify({
+                        "success": True,
+                        "message": "Data perangkat berhasil diperbarui"
+                    })
+
+                except Exception as e:
+                    print("ERROR UPDATE DEVICE:", e, flush=True)
+
+                    return jsonify({
+                        "success": False,
+                        "message": str(e)
+                    }), 500
+                
 
 # --- Manage Complaints ---
 @app.route('/api/complaints', methods=['GET', 'POST', 'PUT'])
@@ -430,142 +460,177 @@ def manage_complaints():
     )
 
     complaints = response.data or []
-    
     if request.method == 'POST':
         try:
-            # ==========================================
-            # AMBIL DATA DARI FORM WEB
-            # ==========================================
             data = request.json or {}
 
-            serial = str(
-                data.get("serial", "")
+            serial = str(data.get("serial", "")).strip()
+            title = str(data.get("title", "")).strip()
+            urgent = bool(data.get("urgent", False))
+
+            # ==============================
+            # VALIDASI INPUT
+            # ==============================
+            if not serial:
+                return jsonify({
+                    "success": False,
+                    "message": "Perangkat belum dipilih"
+                }), 400
+
+            if not title:
+                return jsonify({
+                    "success": False,
+                    "message": "Keluhan wajib diisi"
+                }), 400
+
+            # ==============================
+            # CARI PERANGKAT DARI INVENTARIS
+            # ==============================
+            device_response = (
+                supabase
+                .table("inventaris")
+                .select("*")
+                .eq("serial_number", serial)
+                .limit(1)
+                .execute()
+            )
+
+            if not device_response.data:
+                return jsonify({
+                    "success": False,
+                    "message": "Perangkat tidak ditemukan"
+                }), 404
+
+            device = device_response.data[0]
+
+            # ==============================
+            # CEK STATUS PERANGKAT
+            # ==============================
+            current_status = str(
+                device.get("status", "")
             ).strip()
 
-            # ==========================================
-            # SIAPKAN DATA PENGADUAN
-            # ==========================================
+            if current_status.lower() == "repair":
+                return jsonify({
+                    "success": False,
+                    "message": "Perangkat sedang dalam proses penanganan"
+                }), 409
+
+            # ==============================
+            # CEK TIKET AKTIF
+            # ==============================
+            active_response = (
+                supabase
+                .table("pengaduan")
+                .select("id,status")
+                .eq("serial", serial)
+                .eq("status", "Reported")
+                .limit(1)
+                .execute()
+            )
+
+            if active_response.data:
+                return jsonify({
+                    "success": False,
+                    "message": "Perangkat sudah memiliki tiket aktif"
+                }), 409
+
+            # ==============================
+            # DATA PENGADUAN
+            # Semua detail perangkat diambil
+            # langsung dari master inventaris
+            # ==============================
             new_complaint = {
-                "title": data.get(
-                    "title",
-                    "Pengaduan perangkat"
-                ),
-
-                "location": data.get(
-                    "location"
-                ),
-
-                "urgent": bool(
-                    data.get("urgent", False)
-                ),
-
+                "title": title,
+                "location": device.get("location", "-"),
+                "urgent": urgent,
                 "status": "Reported",
-
-                "asset": data.get(
-                    "asset"
-                ),
-
-                "category": data.get(
-                    "category"
-                ),
-
-                "serial": serial if serial else None,
-
-                "device_name": data.get(
-                    "device_name"
-                ),
-
+                "asset": device.get("aset", "-"),
+                "category": device.get("category", "-"),
+                "serial": serial,
+                "device_name": device.get("device_model", "-"),
                 "source": "web"
             }
 
-            # ==========================================
-            # SIMPAN KE SUPABASE
-            # ==========================================
-            response = (
+            # ==============================
+            # BUAT TIKET
+            # ==============================
+            insert_response = (
                 supabase
                 .table("pengaduan")
                 .insert(new_complaint)
                 .execute()
             )
 
-            if not response.data:
+            if not insert_response.data:
                 return jsonify({
                     "success": False,
                     "message": "Pengaduan gagal disimpan"
                 }), 500
 
-            saved_complaint = response.data[0]
+            saved_complaint = insert_response.data[0]
 
-            # ==========================================
-            # UPDATE INVENTARIS MENJADI REPAIR
-            # MASIH MENGGUNAKAN CSV SEMENTARA
-            # ==========================================
-            if serial:
-                df = load_data()
+            # ==============================
+            # UBAH PERANGKAT -> REPAIR
+            # ==============================
+            try:
+                inventory_response = (
+                    supabase
+                    .table("inventaris")
+                    .update({
+                        "status": "Repair"
+                    })
+                    .eq("serial_number", serial)
+                    .execute()
+                )
 
-                idx = df.index[
-                    df["Serial Number"]
-                    .astype(str)
-                    .str.strip()
-                    == serial
-                ].tolist()
-
-                if idx:
-                    df.at[
-                        idx[0],
-                        "Status"
-                    ] = "Repair"
-
-                    save_data(df)
-
-            # ==========================================
-            # NOTIFIKASI MASIH JSON SEMENTARA
-            # ==========================================
-            # ==========================================
-            # SIMPAN NOTIFIKASI KE SUPABASE
-            # ==========================================
-            notif_data = {
-                "text": (
-                    f"Pengaduan baru: "
-                    f"{saved_complaint.get('title', '')}"
-                ),
-                "device": saved_complaint.get(
-                    "device_name",
-                    ""
-                ),
-                "serial": saved_complaint.get(
-                    "serial",
-                    ""
-                ),
-                "location": saved_complaint.get(
-                    "location",
-                    ""
-                ),
-                "urgent": bool(
-                    saved_complaint.get(
-                        "urgent",
-                        False
+                if not inventory_response.data:
+                    raise Exception(
+                        "Status perangkat gagal diperbarui"
                     )
-                ),
-                "is_read": False    
+
+            except Exception as inventory_error:
+
+                # Rollback tiket jika update inventory gagal
+                (
+                    supabase
+                    .table("pengaduan")
+                    .delete()
+                    .eq("id", saved_complaint["id"])
+                    .execute()
+                )
+
+                raise inventory_error
+
+            # ==============================
+            # BUAT NOTIFIKASI
+            # ==============================
+            notif_data = {
+                "complaint_id": saved_complaint["id"],
+                "text": f"Pengaduan baru: {title}",
+                "device": device.get("device_model", ""),
+                "serial": serial,
+                "location": device.get("location", ""),
+                "urgent": urgent,
+                "is_read": False
             }
 
             (
-        
                 supabase
                 .table("notifikasi")
                 .insert(notif_data)
                 .execute()
-            )   
-            
+            )
+
             return jsonify({
                 "success": True,
+                "message": "Pengaduan berhasil dibuat",
                 "complaint": saved_complaint
             })
 
         except Exception as e:
             print(
-                "Gagal menambah pengaduan ke Supabase:",
+                "Gagal membuat pengaduan:",
                 e,
                 flush=True
             )
@@ -1618,6 +1683,7 @@ def whatsapp_webhook():
                 # SIMPAN NOTIFIKASI WHATSAPP KE SUPABASE
                 # ==========================================
                 notif_data = {
+                    "complaint_id": new_id,
                     "text": (
                         f"Pengaduan baru via WhatsApp: "
                         f"{new_complaint['title']}"
@@ -1848,14 +1914,50 @@ def mark_notifications_read():
 # --- Search ---
 @app.route('/api/search')
 def search_devices():
-    if 'user' not in session: return jsonify({"error": "Unauthorized"}), 401
-    q = request.args.get('q', '').lower()
-    if not q: return jsonify([])
-    
+    if 'user' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    q = request.args.get('q', '').strip().lower()
+
+    if not q:
+        return jsonify([])
+
     df = load_data()
-    # Search in SN or Device Model
-    mask = df['Serial Number'].str.lower().str.contains(q, na=False) | df['Device Model'].str.lower().str.contains(q, na=False)
-    results = df[mask].fillna("-").to_dict('records')
+
+    if df.empty:
+        return jsonify([])
+
+    # Hanya perangkat yang TIDAK sedang Repair
+    df = df[
+        df['Status']
+        .fillna('')
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        != 'repair'
+    ]
+
+    # Cari berdasarkan Device Model atau Serial Number
+    mask = (
+        df['Serial Number']
+        .fillna('')
+        .astype(str)
+        .str.lower()
+        .str.contains(q, na=False, regex=False)
+        |
+        df['Device Model']
+        .fillna('')
+        .astype(str)
+        .str.lower()
+        .str.contains(q, na=False, regex=False)
+    )
+
+    results = (
+        df[mask]
+        .fillna("-")
+        .to_dict('records')
+    )
+
     return jsonify(results)
 
 if __name__ == '__main__':

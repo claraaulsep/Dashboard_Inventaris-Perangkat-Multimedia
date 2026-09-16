@@ -35,9 +35,11 @@
                 class="inline-flex items-center justify-center w-16 h-16 text-lightAccent dark:text-darkAccent text-3xl mb-4">
                 <div class="absolute top-40 left-15">
                     <picture>
-                        <source srcset="{{ url_for('static', filename='lightmode.png') }}"
+                        <source srcset="{{ url_for('static', filename='logoputih.png') }}"
                             media="(prefers-color-scheme: dark)">
-                        <img src="{{ url_for('static', filename='logopertamina.svg') }}" alt="Logo"
+                        <img id="pertaminaLogo" src="{{ url_for('static', filename='lightmode.png') }}"
+                            data-light="{{ url_for('static', filename='lightmode.png') }}"
+                            data-dark="{{ url_for('static', filename='logoputih.png') }}" alt="Logo"
                             style="width: 100px; height: auto;">
                     </picture>
                 </div>
@@ -81,18 +83,15 @@
         </form>
 
         <div class="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
-            <p>Demo Accounts:</p>
-            <p>Admin: admin / 123</p>
-            <p>Manager: Manager / 123</p>
-        </div>
-    </div>
 
-    <!-- Theme Initialization Script (keeps theme consistent on login screen) -->
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
+        </div>
+
+        <!-- Theme Initialization Script (keeps theme consistent on login screen) -->
+        <script>
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        </script>
 </body>
 
 </html>

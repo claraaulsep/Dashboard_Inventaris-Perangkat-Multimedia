@@ -60,6 +60,127 @@
             }
         }
         Chart.register(ChartDataLabels);
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Search perangkat untuk pengaduan
+            const deviceSearch = document.getElementById("deviceSearch");
+            const deviceSuggestions = document.getElementById("deviceSuggestions");
+            const selectedDeviceSerial = document.getElementById("selectedDeviceSerial");
+
+            if (deviceSearch && deviceSuggestions) {
+
+                deviceSearch.addEventListener("input", function () {
+
+                    const keyword = this.value.toLowerCase().trim();
+
+                    deviceSuggestions.innerHTML = "";
+
+                    if (!keyword) {
+                        deviceSuggestions.classList.add("hidden");
+                        return;
+                    }
+
+                    if (!fullData || !fullData.device_list) {
+                        return;
+                    }
+                    const filtered = fullData.device_list.filter(d => {
+                        const model = String(d['Device Model'] || '').toLowerCase();
+                        const serial = String(d['Serial Number'] || '').toLowerCase();
+                        const location = String(d['Location'] || '').toLowerCase();
+                        const status = String(d['Status'] || '').trim().toLowerCase();
+
+                        // Perangkat Repair tidak boleh dibuatkan pengaduan baru
+                        if (status === 'repair') {
+                            return false;
+                        }
+
+                        return (
+                            model.includes(keyword) ||
+                            serial.includes(keyword) ||
+                            location.includes(keyword)
+                        );
+                    });
+
+                    if (filtered.length === 0) {
+                        deviceSuggestions.innerHTML = `
+                            <div class="px-4 py-3 text-sm text-slate-500">
+                                Perangkat tidak ditemukan
+                            </div>
+                        `;
+
+                        deviceSuggestions.classList.remove("hidden");
+                        return;
+                    }
+
+                    filtered.forEach(d => {
+
+                        const option = document.createElement("div");
+
+                        option.className =
+                            "px-4 py-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700";
+
+                        option.innerHTML = `
+                            <div class="font-semibold text-sm">
+                                ${d['Device Model'] || '-'}
+                            </div>
+
+                            <div class="text-xs text-slate-500 mt-1">
+                                S/N: ${d['Serial Number'] || '-'} •
+                                ${d['Location'] || '-'}
+                            </div>
+                        `;
+
+                        option.addEventListener("click", function () {
+
+                            deviceSearch.value = d['Device Model'];
+
+                            if (selectedDeviceSerial) {
+                                selectedDeviceSerial.value = d['Serial Number'];
+                            }
+
+                            document.getElementById('comp-sn').value =
+                                d['Serial Number'];
+
+                            // Otomatis pilih lokasi
+                            const locSel = document.getElementById('comp-loc');
+
+                            if (locSel) {
+                                locSel.value = d['Location'];
+                            }
+
+                            // Tampilkan informasi perangkat
+                            document.getElementById('comp-info-model').textContent =
+                                d['Device Model'] || '-';
+
+                            document.getElementById('comp-info-sn').textContent =
+                                d['Serial Number'] || '-';
+
+                            document.getElementById('comp-info-loc').textContent =
+                                d['Location'] || '-';
+
+                            const statusEl =
+                                document.getElementById('comp-info-status');
+
+                            statusEl.textContent = d['Status'] || '-';
+
+                            statusEl.className =
+                                d['Status'] === 'Repair'
+                                    ? 'font-bold text-orange-600'
+                                    : 'font-bold text-emerald-600';
+
+                            document.getElementById('comp-device-info')
+                                .classList.remove('hidden');
+
+                            deviceSuggestions.classList.add("hidden");
+                        });
+
+                        deviceSuggestions.appendChild(option);
+                    });
+
+                    deviceSuggestions.classList.remove("hidden");
+                });
+            }
+        });
     </script>
     <style>
         body {
@@ -170,6 +291,50 @@
         .dark .sticky-header {
             background-color: rgba(17, 24, 39, 0.9);
         }
+
+        .device-search-wrapper {
+            position: relative;
+        }
+
+        .device-suggestions {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 0 0 8px 8px;
+            z-index: 9999;
+        }
+
+        .device-option {
+            padding: 12px 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .device-option:hover {
+            background: #334155;
+        }
+
+        .device-option strong {
+            color: #f8fafc;
+        }
+
+        .device-option span {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .no-result {
+            padding: 12px 14px;
+            color: #94a3b8;
+        }
     </style>
 </head>
 
@@ -182,8 +347,8 @@
         class="bg-lightSidebar dark:bg-darkCard w-64 flex-shrink-0 fixed md:static inset-y-0 left-0 transform md:translate-x-0 -translate-x-full transition-all duration-300 ease-in-out z-50 flex flex-col border-r border-slate-200 dark:border-slate-700">
         <div class="h-20 flex items-center justify-between px-6 border-b border-white/20 dark:border-slate-700/50">
             <div class="flex items-center gap-3 font-bold text-xl text-slate-800 dark:text-white" id="sidebar-logo">
-                <i class="fa-solid fa-fire text-lightAccent dark:text-darkAccent"></i>
-                <span class="logo-text">PERTAMINA</span>
+                <img src="{{ url_for('static', filename='logosidebar.png') }}" alt="Logo Pertamina" class="w-8 h-auto">
+                <span class="logo-text">PT. PERTAMINA</span>
             </div>
             <button onclick="toggleSidebar()"
                 class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-transform duration-300"
@@ -249,9 +414,7 @@
                 </div>
 
                 <!-- Notif -->
-                <div class="relative">
-                    <button onclick="
-                        Notifications()"
+                <div class="relative"><button onclick="ReportedNotifications()"
                         class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
                         <i class="fa-regular fa-bell text-xl"></i>
                         <span id="notif-dot"
@@ -527,7 +690,6 @@
 
                         </div>
 
-
                         <!-- EXPORT LAPORAN PDF -->
                         <div
                             class="flex flex-col lg:flex-row lg:items-end gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -536,82 +698,63 @@
                                 <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
                                     Laporan Pengaduan
                                 </p>
-
                                 <p class="text-xs text-slate-500 mt-1">
                                     Pilih periode laporan yang ingin diekspor.
                                 </p>
                             </div>
 
-
-                            <div class="lg:ml-auto flex flex-col sm:flex-row gap-3">
+                            <form action="/export/pengaduan/pdf" method="GET"
+                                class="lg:ml-auto flex flex-col sm:flex-row gap-3 items-end">
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-500 mb-1">
-
+                                    <label for="report-start-date"
+                                        class="block text-xs font-medium text-slate-500 mb-1">
                                         Tanggal Mulai
-
                                     </label>
-                                    <form action="/export/pengaduan/pdf" method="GET"
-                                        class="lg:ml-auto flex flex-col sm:flex-row gap-3">
 
-                                        <div>
-                                            <label class="block text-xs font-medium text-slate-500 mb-1">
-                                                Tanggal Mulai
-                                            </label>
-
-                                            <input type="date" name="start" required
-                                                class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-xs font-medium text-slate-500 mb-1">
-                                                Tanggal Akhir
-                                            </label>
-
-                                            <input type="date" name="end" required
-                                                class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-
-                                        <div class="flex items-end">
-                                            <button type="submit"
-                                                class="w-full sm:w-auto px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
-
-                                                <i class="fa-solid fa-file-pdf mr-2"></i>
-                                                Export PDF
-
-                                            </button>
-                                        </div>
-
-                                    </form>
-
-
+                                    <input type="date" id="report-start-date" name="start" required
+                                        onclick="this.showPicker()"
+                                        class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
 
-                            </div>
+                                <div>
+                                    <label for="report-end-date" class="block text-xs font-medium text-slate-500 mb-1">
+                                        Tanggal Akhir
+                                    </label>
 
+                                    <input type="date" id="report-end-date" name="end" required
+                                        onclick="this.showPicker()"
+                                        class="w-full sm:w-auto px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+
+                                <button type="submit"
+                                    class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition shadow-sm">
+
+                                    <i class="fa-solid fa-file-pdf mr-2"></i>
+                                    Export PDF
+                                </button>
+
+                            </form>
                         </div>
 
-                    </div>
-
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-xs uppercase bg-slate-50 dark:bg-slate-800">
-                                <tr>
-                                    <th class="px-4 py-3">ID</th>
-                                    <th class="px-4 py-3">Judul Pengaduan</th>
-                                    <th class="px-4 py-3">Lokasi</th>
-                                    <th class="px-4 py-3">Serial Number</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="complaints-tbody" class="divide-y divide-slate-200"></tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase bg-slate-50 dark:bg-slate-800">
+                                    <tr>
+                                        <th class="px-4 py-3">ID</th>
+                                        <th class="px-4 py-3">Judul Pengaduan</th>
+                                        <th class="px-4 py-3">Lokasi</th>
+                                        <th class="px-4 py-3">Serial Number</th>
+                                        <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="complaints-tbody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-
+            </div> <!-- PENUTUP view-pengaduan -->
             <!-- ================= VIEW: DATA PERANGKAT ================= -->
             <div id="view-data" class="view-section space-y-6">
                 <div
@@ -661,7 +804,8 @@
                             {% if role == 'admin' %}bg-blue-100 text-blue-700{% else %}bg-slate-100 text-slate-600{% endif %}">
                             {{ role }}
                         </span>
-                        <p class="text-sm text-slate-500 mt-3">Pertamina Zona 1 & Field Jambi<br>Dashboard Inventaris
+                        <p class="text-sm text-slate-500 mt-3">Pertamina Zona 1 & Field Jambi<br>Dashboard
+                            Inventaris
                             Multimedia</p>
                         <a href="/logout"
                             class="mt-5 w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-semibold transition"><i
@@ -678,7 +822,8 @@
                                 class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700">
                                 <div>
                                     <p class="text-sm font-medium">Mode Gelap</p>
-                                    <p class="text-xs text-slate-500 mt-0.5">Aktifkan tema gelap untuk tampilan malam
+                                    <p class="text-xs text-slate-500 mt-0.5">Aktifkan tema gelap untuk tampilan
+                                        malam
                                     </p>
                                 </div>
                                 <button onclick="toggleDarkMode()"
@@ -705,7 +850,7 @@
                                 class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700">
                                 <div>
                                     <p class="text-sm font-medium">Sumber Data</p>
-                                    <p class="text-xs text-slate-500 mt-0.5">File CSV inventaris aktif</p>
+                                    <p class="text-xs text-slate-500 mt-0.5"></p>
                                 </div>
                                 <span
                                     class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">data.csv</span>
@@ -728,14 +873,14 @@
                             <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 mb-4"><i
                                     class="fa-solid fa-circle-info mr-2 text-pink-500"></i>Informasi Sistem</h3>
                             <div class="space-y-3 text-sm">
-                                <div class="flex justify-between"><span class="text-slate-500">Versi Dasbor</span><span
-                                        class="font-semibold">v2.0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Versi
+                                        Dasbor</span><span class="font-semibold">v2.0</span></div>
                                 <div class="flex justify-between"><span class="text-slate-500">Framework
                                         Backend</span><span class="font-semibold">Python Flask</span></div>
                                 <div class="flex justify-between"><span class="text-slate-500">Visualisasi</span><span
                                         class="font-semibold">Chart.js + DataLabels</span></div>
-                                <div class="flex justify-between"><span class="text-slate-500">Area Coverage</span><span
-                                        class="font-semibold">Zona 1 & Field Jambi</span></div>
+                                <div class="flex justify-between"><span class="text-slate-500">Area
+                                        Coverage</span><span class="font-semibold">Zona 1 & Field Jambi</span></div>
                             </div>
                         </div>
                     </div>
@@ -812,58 +957,61 @@
                 <form onsubmit="handleComplaintSubmit(event)">
                     <div class="space-y-3">
                         <!-- Step 1: Select device from dropdown -->
-                        <div>
-                            <label class="block text-xs font-bold mb-1">Pilih Perangkat <span
-                                    class="text-red-500">*</span></label>
-                            <select required id="comp-device-select" onchange="onComplaintDeviceSelect()"
-                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600">
-                                <option value="">-- Pilih Perangkat --</option>
-                            </select>
+                        <!-- Pencarian perangkat -->
+                        <div class="relative">
+                            <label class="block text-sm font-medium mb-2">
+                                Pilih Perangkat <span class="text-red-500">*</span>
+                            </label>
+
+                            <input type="text" id="deviceSearch" placeholder="Cari nama perangkat atau serial number..."
+                                autocomplete="off" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600
+                                    bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <input type="hidden" id="selectedDeviceSerial">
+
+                            <div id="deviceSuggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800
+                                    border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg
+                                    max-h-60 overflow-y-auto z-50">
+                            </div>
                         </div>
-                        <!-- Auto-filled info after device selected -->
-                        <div id="comp-device-info"
-                            class="hidden bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs space-y-1">
-                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Model:</span> <span
-                                    id="comp-info-model" class="font-mono"></span></p>
-                            <p><span class="font-bold text-slate-600 dark:text-slate-300">S/N:</span> <span
-                                    id="comp-info-sn" class="font-mono"></span></p>
-                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Lokasi:</span> <span
-                                    id="comp-info-loc"></span></p>
-                            <p><span class="font-bold text-slate-600 dark:text-slate-300">Status Saat Ini:</span> <span
-                                    id="comp-info-status" class="font-bold"></span></p>
-                        </div>
-                        <!-- Hidden fields injected from selection -->
-                        <input type="hidden" id="comp-sn">
-                        <!-- Lokasi dropdown -->
-                        <div>
-                            <label class="block text-xs font-bold mb-1">Lokasi Pengaduan <span
-                                    class="text-red-500">*</span></label>
-                            <select required id="comp-loc"
-                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600">
-                                <option value="">-- Pilih Lokasi --</option>
-                            </select>
-                        </div>
-                        <div><label class="block text-xs font-bold mb-1">Deskripsi Masalah <span
-                                    class="text-red-500">*</span></label><textarea required id="comp-title" rows="2"
-                                class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600"
-                                placeholder="Cth: Proyektor tidak menyala, layar blur, dll..."></textarea></div>
-                        <div class="flex items-center gap-2 mt-2">
-                            <input type="checkbox" id="comp-urgent" class="w-4 h-4 text-blue-600 rounded">
-                            <label for="comp-urgent"
-                                class="text-sm font-medium text-slate-700 dark:text-slate-300">Tandai Mendesak
-                                (Urgent)</label>
-                        </div>
+
                     </div>
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button type="button" onclick="closeComplaintModal()"
-                            class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Batal</button>
-                        <button type="submit"
-                            class="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded shadow">Kirim
-                            Pengaduan</button>
+                    <!-- Auto-filled info after device selected -->
+                    <div id="comp-device-info"
+                        class="hidden bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs space-y-1">
+                        <p><span class="font-bold text-slate-600 dark:text-slate-300">Model:</span> <span
+                                id="comp-info-model" class="font-mono"></span></p>
+                        <p><span class="font-bold text-slate-600 dark:text-slate-300">S/N:</span> <span
+                                id="comp-info-sn" class="font-mono"></span></p>
+                        <p><span class="font-bold text-slate-600 dark:text-slate-300">Lokasi:</span> <span
+                                id="comp-info-loc"></span></p>
+                        <p><span class="font-bold text-slate-600 dark:text-slate-300">Status Saat Ini:</span> <span
+                                id="comp-info-status" class="font-bold"></span></p>
                     </div>
-                </form>
+                    <!-- Hidden fields injected from selection -->
+                    <input type="hidden" id="comp-sn">
+
+                    <div><label class="block text-xs font-bold mb-1">Deskripsi Masalah <span
+                                class="text-red-500">*</span></label><textarea required id="comp-title" rows="2"
+                            class="w-full border rounded p-2 text-sm bg-slate-50 outline-none focus:ring-2 dark:bg-slate-800 dark:border-slate-600"
+                            placeholder="Cth: Proyektor tidak menyala, layar blur, dll..."></textarea></div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="checkbox" id="comp-urgent" class="w-4 h-4 text-blue-600 rounded">
+                        <label for="comp-urgent" class="text-sm font-medium text-slate-700 dark:text-slate-300">Tandai
+                            Mendesak
+                            (Urgent)</label>
+                    </div>
             </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" onclick="closeComplaintModal()"
+                    class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Batal</button>
+                <button type="submit"
+                    class="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded shadow">Kirim
+                    Pengaduan</button>
+            </div>
+            </form>
         </div>
+    </div>
     </div>
 
     <!-- Full-Screen Device Search Modal -->
@@ -985,15 +1133,78 @@
 
         function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
         async function ReportedNotifications() {
-            const dot = document.getElementById('notif-dot');
-            const badge = document.getElementById('notif-badge');
-            dot.classList.add('hidden');
-            badge.classList.add('hidden');
-            document.getElementById('notifDropdown').classList.toggle('hidden');
-            // Mark as read on server
-            await fetch('/api/notifications/read', { method: 'POST' });
+            const dropdown = document.getElementById('notifDropdown');
+
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+
+            try {
+                await fetch('/api/notifications/read', {
+                    method: 'POST'
+                });
+            } catch (err) {
+                console.error('Gagal menandai notifikasi:', err);
+            }
         }
+
+
+        function openComplaintFromNotification(complaintId) {
+            if (!complaintId) {
+                console.warn('Notifikasi lama belum memiliki complaint_id');
+                return;
+            }
+
+            // Pindah ke halaman Pengaduan
+            switchView('pengaduan');
+
+            // Tutup dropdown notifikasi
+            const dropdown = document.getElementById('notifDropdown');
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+
+            setTimeout(() => {
+                const row = document.querySelector(
+                    `[data-complaint-id="${complaintId}"]`
+                );
+
+                if (!row) {
+                    console.warn('Tiket tidak ditemukan:', complaintId);
+                    return;
+                }
+
+                row.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                row.classList.add(
+                    'ring-2',
+                    'ring-blue-500',
+                    'bg-blue-50',
+                    'dark:bg-blue-900/20'
+                );
+
+                setTimeout(() => {
+                    row.classList.remove(
+                        'ring-2',
+                        'ring-blue-500',
+                        'bg-blue-50',
+                        'dark:bg-blue-900/20'
+                    );
+                }, 3000);
+
+            }, 300);
+        }
+
         function toggleDarkMode() {
+            const logo = document.getElementById('pertaminaLogo');
+
+            if (logo) {
+                const isDark = document.documentElement.classList.contains('dark');
+                logo.src = isDark ? logo.dataset.dark : logo.dataset.light;
+            }
             const html = document.documentElement;
             if (html.classList.contains('dark')) {
                 html.classList.remove('dark'); localStorage.setItem('theme', 'light');
@@ -1056,16 +1267,22 @@
                     notifList.innerHTML = '<p class="text-xs text-slate-500 text-center py-6">Belum ada notifikasi.</p>';
                 } else {
                     notifList.innerHTML = items.map(n => `
-                        <div class="flex gap-3 items-start px-4 py-3 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800">
-                            <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div
+                        onclick="openComplaintFromNotification(${n.complaint_id || 'null'})"
+                        class="flex gap-3 items-start px-4 py-3 border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                   
+                        <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <i class="fa-solid fa-bullhorn text-orange-500 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium">${n.text}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                ${n.location || ''} ${n.serial ? '• SN: ' + n.serial : ''}
+                            </p>
+                            ${n.urgent ? '<span class="text-[10px] font-bold bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded uppercase">Mendesak</span>' : ''}
                             </div>
-                            <div>
-                                <p class="text-sm font-medium">${n.text}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">${n.location || ''} ${n.serial ? '• SN: ' + n.serial : ''}</p>
-                                ${n.urgent ? '<span class="text-[10px] font-bold bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded uppercase">Mendesak</span>' : ''}
-                            </div>
-                        </div>`).join('');
+                        </div>
+                        `).join('');
                 }
 
                 renderDashboard(data, complaintsData.complaints);
@@ -1185,8 +1402,8 @@
                 }
 
                 tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
-                        <td class="px-4 py-3">#${c.id}</td>
+                    <tr data-complaint-id="${c.id}" class="hover:bg-slate-50 dark:hover:bg-slate-800">
+            
 
                         <td class="px-4 py-3 font-medium">
                             ${c.title || '-'}
@@ -1248,80 +1465,59 @@
 
         // --- Complaint Logic ---
         function ReportedComplaintModal() {
-            function exportComplaintPDF() {
-
-                const startDate = document.getElementById(
-                    'report-start-date'
-                ).value;
-
-                const endDate = document.getElementById(
-                    'report-end-date'
-                ).value;
 
 
-                if (!startDate || !endDate) {
-
-                    alert(
-                        'Silakan pilih tanggal mulai dan tanggal akhir terlebih dahulu.'
-                    );
-
-                    return;
-                }
-
-
-                if (endDate < startDate) {
-
-                    alert(
-                        'Tanggal akhir tidak boleh lebih kecil dari tanggal mulai.'
-                    );
-
-                    return;
-                }
-
-
-                const url =
-                    '/export/pengaduan/pdf'
-                    + '?start='
-                    + encodeURIComponent(startDate)
-                    + '&end='
-                    + encodeURIComponent(endDate);
-
-
-                window.location.href = url;
-            }
-            // Populate device dropdown
-            if (fullData && fullData.device_list) {
-                const sel = document.getElementById('comp-device-select');
-                sel.innerHTML = '<option value="">-- Pilih Perangkat --</option>';
-                fullData.device_list.forEach(d => {
-                    const opt = document.createElement('option');
-                    opt.value = d['Serial Number'];
-                    opt.textContent = `${d['Device Model']} (${d['Serial Number']})`;
-                    opt.dataset.model = d['Device Model'];
-                    opt.dataset.sn = d['Serial Number'];
-                    opt.dataset.loc = d['Location'];
-                    opt.dataset.status = d['Status'];
-                    opt.dataset.aset = d['Aset'];
-                    sel.appendChild(opt);
-                });
-            }
-            // Populate location dropdown from filter_options
-            if (fullData && fullData.filter_options && fullData.filter_options.lokasi) {
-                const locSel = document.getElementById('comp-loc');
-                locSel.innerHTML = '<option value="">-- Pilih Lokasi --</option>';
-                fullData.filter_options.lokasi.forEach(l => {
-                    const opt = document.createElement('option');
-                    opt.value = l; opt.textContent = l;
-                    locSel.appendChild(opt);
-                });
-            }
             document.getElementById('comp-device-info').classList.add('hidden');
             document.getElementById('comp-title').value = '';
             document.getElementById('comp-urgent').checked = false;
             document.getElementById('comp-sn').value = '';
+            const deviceSearch = document.getElementById('deviceSearch');
+            if (deviceSearch) {
+                deviceSearch.value = '';
+            }
             document.getElementById('complaintModal').classList.remove('hidden');
         }
+        function filterComplaintDevices() {
+            const searchInput = document.getElementById('comp-device-search');
+            const sel = document.getElementById('comp-device-select');
 
+            if (!searchInput || !sel || !fullData || !fullData.device_list) {
+                return;
+            }
+
+            const keyword = searchInput.value.trim().toLowerCase();
+
+            sel.innerHTML = '<option value="">-- Pilih Perangkat --</option>';
+
+            const filteredDevices = fullData.device_list.filter(d => {
+                const model = String(d['Device Model'] || '').toLowerCase();
+                const serial = String(d['Serial Number'] || '').toLowerCase();
+                const location = String(d['Location'] || '').toLowerCase();
+
+                return (
+                    model.includes(keyword) ||
+                    serial.includes(keyword) ||
+                    location.includes(keyword)
+                );
+            });
+
+            filteredDevices.forEach(d => {
+                const opt = document.createElement('option');
+
+                opt.value = d['Serial Number'];
+
+                opt.textContent =
+                    `${d['Device Model']} (${d['Serial Number']}) - ${d['Location']}`;
+
+                opt.dataset.model = d['Device Model'];
+                opt.dataset.sn = d['Serial Number'];
+                opt.dataset.loc = d['Location'];
+                opt.dataset.status = d['Status'];
+                opt.dataset.aset = d['Aset'];
+
+                sel.appendChild(opt);
+            });
+        }
         function onComplaintDeviceSelect() {
             const sel = document.getElementById('comp-device-select');
             const opt = sel.selectedOptions[0];
@@ -1348,23 +1544,66 @@
         }
 
         function closeComplaintModal() { document.getElementById('complaintModal').classList.add('hidden'); }
-
         async function handleComplaintSubmit(e) {
             e.preventDefault();
-            const sel = document.getElementById('comp-device-select');
-            const opt = sel.selectedOptions[0];
+
+            const serial = document.getElementById('comp-sn').value.trim();
+            const title = document.getElementById('comp-title').value.trim();
+
+            // Pastikan perangkat sudah dipilih dari hasil pencarian
+            if (!serial) {
+                alert("Silakan pilih perangkat terlebih dahulu.");
+                return;
+            }
+
+            if (!title) {
+                alert("Silakan isi deskripsi masalah.");
+                return;
+            }
+
+            // Cari data perangkat berdasarkan serial yang dipilih
+            const device = fullData.device_list.find(d =>
+                String(d['Serial Number'] || '').trim() === serial
+            );
+
+            if (!device) {
+                alert("Data perangkat tidak ditemukan.");
+                return;
+            }
+
+            // Pengamanan tambahan: Repair tidak boleh dilaporkan lagi
+            if (String(device['Status'] || '').trim().toLowerCase() === 'repair') {
+                alert("Perangkat ini sedang dalam status Repair dan sudah memiliki pengaduan aktif.");
+                return;
+            }
+
             const payload = {
-                title: document.getElementById('comp-title').value,
-                location: document.getElementById('comp-loc').value,
-                serial: document.getElementById('comp-sn').value,
-                device_name: opt ? opt.dataset.model : '',
+                title: title,
+                location: device['Location'] || '',
+                serial: serial,
+                device_name: device['Device Model'] || '',
                 urgent: document.getElementById('comp-urgent').checked
             };
-            const res = await fetch('/api/complaints', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+            const res = await fetch('/api/complaints', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
             if (res.ok) {
-                closeComplaintModal(); fetchAllData(); alert("Pengaduan terkirim!");
+                closeComplaintModal();
+                fetchAllData();
+                alert("Pengaduan terkirim!");
+            } else {
+                alert(result.message || "Gagal mengirim pengaduan.");
             }
         }
+
         async function resolveComplaint(id) {
             if (!confirm("Tandai pengaduan selesai? Status barang otomatis diubah ke 'In Use'.")) return;
             const res = await fetch('/api/complaints', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
@@ -1377,8 +1616,11 @@
             const resDiv = document.getElementById('searchResults');
             if (q.length < 2) { resDiv.classList.add('hidden'); return; }
             const items = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
+            const availableItems = items.filter(device =>
+                (device.Status || '').toLowerCase() !== 'repair'
+            );
             resDiv.innerHTML = '';
-            if (items.length === 0) {
+            if (availableItems.length === 0) {
                 resDiv.innerHTML = '<div class="p-4 text-sm text-slate-500">Tidak ada hasil.</div>';
             } else {
                 items.forEach(i => {
@@ -1409,6 +1651,48 @@
             document.getElementById('searchResults').classList.add('hidden');
             modal.classList.remove('hidden');
         }
+        // ==========================================
+        // PENGADUAN PERANGKAT
+        // ==========================================
+
+        // Menyimpan perangkat yang dipilih
+        let selectedComplaintDevice = null;
+
+        // Saat perangkat dari hasil search diklik
+        function selectComplaintDevice(device) {
+            selectedComplaintDevice = device;
+
+            document.getElementById('deviceSearch').value =
+                device['Device Model'];
+
+            document.getElementById('selectedDeviceSerial').value =
+                device['Serial Number'];
+
+            document.getElementById('selectedModel').textContent =
+                device['Device Model'] || '-';
+
+            document.getElementById('selectedSerial').textContent =
+                device['Serial Number'] || '-';
+
+            document.getElementById('selectedCategory').textContent =
+                device['Category'] || '-';
+
+            document.getElementById('selectedLocation').textContent =
+                device['Location'] || '-';
+
+            document.getElementById('selectedAsset').textContent =
+                device['Aset'] || '-';
+
+            document.getElementById('selectedStatus').textContent =
+                device['Status'] || '-';
+
+            document.getElementById('selectedDeviceDetail')
+                .classList.remove('hidden');
+
+            document.getElementById('deviceSuggestions')
+                .classList.add('hidden');
+        }
+
 
         function closeSearchModal(e) {
             if (e.target === document.getElementById('searchModal')) {
